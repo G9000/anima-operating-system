@@ -1,7 +1,7 @@
 {
-  "deno.enablePaths": [
-    "supabase/functions"
-  ],
+  "cSpell.enabled": false,
+  "editor.formatOnSave": true,
+  "deno.enablePaths": ["supabase/functions"],
   "deno.lint": true,
   "deno.unstable": [
     "bare-node-builtins",
