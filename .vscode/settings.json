@@ -20,5 +20,13 @@
   ],
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true
   }
 }
