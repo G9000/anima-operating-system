@@ -22,11 +22,23 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(_TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["Resume",]
+          ["EmailAnalysis","EmailResponse","EmailSummary","Resume",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
 
+
+    @property
+    def EmailAnalysis(self) -> "EmailAnalysisAst":
+        return EmailAnalysisAst(self)
+
+    @property
+    def EmailResponse(self) -> "EmailResponseAst":
+        return EmailResponseAst(self)
+
+    @property
+    def EmailSummary(self) -> "EmailSummaryAst":
+        return EmailSummaryAst(self)
 
     @property
     def Resume(self) -> "ResumeAst":
@@ -35,6 +47,180 @@ class TypeBuilder(_TypeBuilder):
 
 
 
+
+class EmailAnalysisAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("EmailAnalysis")
+        self._properties: typing.Set[str] = set([ "summary",  "key_points",  "sentiment",  "urgency",  "requires_response",  "suggested_actions", ])
+        self._props = EmailAnalysisProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "EmailAnalysisProperties":
+        return self._props
+
+
+class EmailAnalysisViewer(EmailAnalysisAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class EmailAnalysisProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def summary(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("summary"))
+
+    @property
+    def key_points(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("key_points"))
+
+    @property
+    def sentiment(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("sentiment"))
+
+    @property
+    def urgency(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("urgency"))
+
+    @property
+    def requires_response(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("requires_response"))
+
+    @property
+    def suggested_actions(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("suggested_actions"))
+
+    
+
+class EmailResponseAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("EmailResponse")
+        self._properties: typing.Set[str] = set([ "tone",  "content",  "subject", ])
+        self._props = EmailResponseProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "EmailResponseProperties":
+        return self._props
+
+
+class EmailResponseViewer(EmailResponseAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class EmailResponseProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def tone(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("tone"))
+
+    @property
+    def content(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("content"))
+
+    @property
+    def subject(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("subject"))
+
+    
+
+class EmailSummaryAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("EmailSummary")
+        self._properties: typing.Set[str] = set([ "id",  "sender",  "subject",  "date",  "snippet",  "importance",  "category",  "action_needed",  "deadline", ])
+        self._props = EmailSummaryProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "EmailSummaryProperties":
+        return self._props
+
+
+class EmailSummaryViewer(EmailSummaryAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class EmailSummaryProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def id(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("id"))
+
+    @property
+    def sender(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("sender"))
+
+    @property
+    def subject(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("subject"))
+
+    @property
+    def date(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("date"))
+
+    @property
+    def snippet(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("snippet"))
+
+    @property
+    def importance(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("importance"))
+
+    @property
+    def category(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("category"))
+
+    @property
+    def action_needed(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("action_needed"))
+
+    @property
+    def deadline(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("deadline"))
+
+    
 
 class ResumeAst:
     def __init__(self, tb: _TypeBuilder):

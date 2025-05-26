@@ -3,9 +3,8 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 import uuid
 from app.db.database import Base
 
-
-class Persona(Base):
-    __tablename__ = "personas"
+class Construct(Base):
+    __tablename__ = "constructs"
     id = Column(UUID(as_uuid=True), primary_key=True,
                 default=uuid.uuid4, unique=True, nullable=False)
     schema_version = Column(String, nullable=False)

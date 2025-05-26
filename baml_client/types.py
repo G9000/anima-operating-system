@@ -41,6 +41,30 @@ def all_succeeded(checks: Dict[CheckName, Check]) -> bool:
 
 
 
+class EmailAnalysis(BaseModel):
+    summary: str
+    key_points: List[str]
+    sentiment: Union[Literal["positive"], Literal["neutral"], Literal["negative"]]
+    urgency: Union[Literal["low"], Literal["medium"], Literal["high"]]
+    requires_response: bool
+    suggested_actions: List[str]
+
+class EmailResponse(BaseModel):
+    tone: Union[Literal["professional"], Literal["casual"], Literal["friendly"], Literal["formal"]]
+    content: str
+    subject: Optional[str] = None
+
+class EmailSummary(BaseModel):
+    id: str
+    sender: str
+    subject: str
+    date: str
+    snippet: str
+    importance: Union[Literal["low"], Literal["medium"], Literal["high"]]
+    category: Union[Literal["work"], Literal["personal"], Literal["promotional"], Literal["social"], Literal["updates"], Literal["spam"]]
+    action_needed: bool
+    deadline: Optional[str] = None
+
 class Resume(BaseModel):
     name: str
     email: str

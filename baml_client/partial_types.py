@@ -37,6 +37,30 @@ class StreamState(BaseModel, Generic[T]):
     state: Literal["Pending", "Incomplete", "Complete"]
 
 
+class EmailAnalysis(BaseModel):
+    summary: Optional[str] = None
+    key_points: List[str]
+    sentiment: Optional[Union[Literal["positive"], Literal["neutral"], Literal["negative"]]] = None
+    urgency: Optional[Union[Literal["low"], Literal["medium"], Literal["high"]]] = None
+    requires_response: Optional[bool] = None
+    suggested_actions: List[str]
+
+class EmailResponse(BaseModel):
+    tone: Optional[Union[Literal["professional"], Literal["casual"], Literal["friendly"], Literal["formal"]]] = None
+    content: Optional[str] = None
+    subject: Optional[str] = None
+
+class EmailSummary(BaseModel):
+    id: Optional[str] = None
+    sender: Optional[str] = None
+    subject: Optional[str] = None
+    date: Optional[str] = None
+    snippet: Optional[str] = None
+    importance: Optional[Union[Literal["low"], Literal["medium"], Literal["high"]]] = None
+    category: Optional[Union[Literal["work"], Literal["personal"], Literal["promotional"], Literal["social"], Literal["updates"], Literal["spam"]]] = None
+    action_needed: Optional[bool] = None
+    deadline: Optional[str] = None
+
 class Resume(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
