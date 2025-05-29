@@ -21,6 +21,7 @@ dependencies = [
     "python-jose[cryptography]>=3.4.0",
     "sqlalchemy>=2.0.41",
     "supabase>=2.15.1",
+    "tiktoken>=0.8.0",
 ]
 
 [tool.setuptools]

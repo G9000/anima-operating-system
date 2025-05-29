@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 import uuid
 
@@ -14,6 +14,7 @@ class AgentChatRequest(BaseModel):
     query: str
     chat_history: List[ChatHistory] = []
     thread_id: str
+    mode: Optional[Literal["chat", "roleplay", "journal", "story", "assist", "silent"]] = "chat"
 
 class AgentChatResponse(BaseModel):
     type: str
@@ -31,6 +32,7 @@ class ChatRequest(BaseModel):
     max_tokens: Optional[int] = None
     stream: Optional[bool] = False
     thread_id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
+    mode: Optional[Literal["chat", "roleplay", "journal", "story", "assist", "silent"]] = "chat"
 
 class ChatChoice(BaseModel):
     index: int

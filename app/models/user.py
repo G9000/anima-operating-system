@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID, ENUM
+from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 import uuid
 from app.db.database import Base
@@ -27,3 +28,5 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(
     ), onupdate=func.now(), nullable=False)
     
+    # Relationship to Constructs
+    constructs = relationship("Construct", back_populates="creator")

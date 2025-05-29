@@ -32,10 +32,10 @@ async def chat_completions(
             content={"error": "User not found"}
         )
     
-
     langchain_messages = await ChatService.convert_chat_messages_to_langchain(
         request.messages,
-        db
+        db,
+        request.mode
     )
     
     if not model_service.is_available():
@@ -79,5 +79,7 @@ async def chat_completions(
                 }
             }
         )
+
+
 
 
