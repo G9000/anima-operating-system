@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from uuid import UUID
 
 from app.schemas.chat_models import ChatRequest
@@ -19,10 +20,12 @@ router = APIRouter(prefix="/v1")
 async def chat_completions(
     request: ChatRequest,
     current_user_id: UUID = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Chat completions endpoint with agent support."""
-    current_user = db.query(User).filter(User.id == current_user_id).first()
+    result = await db.execute(select(User).filter(User.id == current_user_id))
+    current_user = result.scalar_one_or_none()
+    
     if not current_user:
         return JSONResponse(
             status_code=401,

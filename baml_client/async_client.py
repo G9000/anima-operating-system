@@ -100,87 +100,6 @@ class BamlAsyncClient:
       return self.__llm_stream_parser
 
     
-    async def AnalyzeEmail(
-        self,
-        email_content: str,
-        baml_options: BamlCallOptions = {},
-    ) -> types.EmailAnalysis:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = await self.__runtime.call_function(
-        "AnalyzeEmail",
-        {
-          "email_content": email_content,
-        },
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-      return cast(types.EmailAnalysis, raw.cast_to(types, types, partial_types, False))
-    
-    async def AnalyzeEmails(
-        self,
-        emails: str,
-        baml_options: BamlCallOptions = {},
-    ) -> List[types.EmailSummary]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = await self.__runtime.call_function(
-        "AnalyzeEmails",
-        {
-          "emails": emails,
-        },
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-      return cast(List[types.EmailSummary], raw.cast_to(types, types, partial_types, False))
-    
-    async def ExtractActionItems(
-        self,
-        emails: str,
-        baml_options: BamlCallOptions = {},
-    ) -> List[str]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = await self.__runtime.call_function(
-        "ExtractActionItems",
-        {
-          "emails": emails,
-        },
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-      return cast(List[str], raw.cast_to(types, types, partial_types, False))
-    
     async def ExtractResume(
         self,
         resume: str,
@@ -208,11 +127,11 @@ class BamlAsyncClient:
       )
       return cast(types.Resume, raw.cast_to(types, types, partial_types, False))
     
-    async def GenerateEmailResponse(
+    async def GenerateConstruct(
         self,
-        email_content: str,response_type: str,context: Optional[str],
+        promptReq: str,
         baml_options: BamlCallOptions = {},
-    ) -> types.EmailResponse:
+    ) -> types.Construct:
       options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
 
       __tb__ = options.get("tb", None)
@@ -224,43 +143,16 @@ class BamlAsyncClient:
       collector = options.get("collector", None)
       collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
       raw = await self.__runtime.call_function(
-        "GenerateEmailResponse",
+        "GenerateConstruct",
         {
-          "email_content": email_content,"response_type": response_type,"context": context,
+          "promptReq": promptReq,
         },
         self.__ctx_manager.get(),
         tb,
         __cr__,
         collectors,
       )
-      return cast(types.EmailResponse, raw.cast_to(types, types, partial_types, False))
-    
-    async def PrioritizeEmails(
-        self,
-        emails: str,user_preferences: Optional[str],
-        baml_options: BamlCallOptions = {},
-    ) -> List[types.EmailSummary]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = await self.__runtime.call_function(
-        "PrioritizeEmails",
-        {
-          "emails": emails,"user_preferences": user_preferences,
-        },
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-      return cast(List[types.EmailSummary], raw.cast_to(types, types, partial_types, False))
+      return cast(types.Construct, raw.cast_to(types, types, partial_types, False))
     
 
 
@@ -273,105 +165,6 @@ class BamlStreamClient:
       self.__ctx_manager = ctx_manager
       self.__baml_options = baml_options or {}
 
-    
-    def AnalyzeEmail(
-        self,
-        email_content: str,
-        baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[partial_types.EmailAnalysis, types.EmailAnalysis]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = self.__runtime.stream_function(
-        "AnalyzeEmail",
-        {
-          "email_content": email_content,
-        },
-        None,
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-
-      return baml_py.BamlStream[partial_types.EmailAnalysis, types.EmailAnalysis](
-        raw,
-        lambda x: cast(partial_types.EmailAnalysis, x.cast_to(types, types, partial_types, True)),
-        lambda x: cast(types.EmailAnalysis, x.cast_to(types, types, partial_types, False)),
-        self.__ctx_manager.get(),
-      )
-    
-    def AnalyzeEmails(
-        self,
-        emails: str,
-        baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[List[partial_types.EmailSummary], List[types.EmailSummary]]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = self.__runtime.stream_function(
-        "AnalyzeEmails",
-        {
-          "emails": emails,
-        },
-        None,
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-
-      return baml_py.BamlStream[List[partial_types.EmailSummary], List[types.EmailSummary]](
-        raw,
-        lambda x: cast(List[partial_types.EmailSummary], x.cast_to(types, types, partial_types, True)),
-        lambda x: cast(List[types.EmailSummary], x.cast_to(types, types, partial_types, False)),
-        self.__ctx_manager.get(),
-      )
-    
-    def ExtractActionItems(
-        self,
-        emails: str,
-        baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[List[Optional[str]], List[str]]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = self.__runtime.stream_function(
-        "ExtractActionItems",
-        {
-          "emails": emails,
-        },
-        None,
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-
-      return baml_py.BamlStream[List[Optional[str]], List[str]](
-        raw,
-        lambda x: cast(List[Optional[str]], x.cast_to(types, types, partial_types, True)),
-        lambda x: cast(List[str], x.cast_to(types, types, partial_types, False)),
-        self.__ctx_manager.get(),
-      )
     
     def ExtractResume(
         self,
@@ -406,11 +199,11 @@ class BamlStreamClient:
         self.__ctx_manager.get(),
       )
     
-    def GenerateEmailResponse(
+    def GenerateConstruct(
         self,
-        email_content: str,response_type: str,context: Optional[str],
+        promptReq: str,
         baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[partial_types.EmailResponse, types.EmailResponse]:
+    ) -> baml_py.BamlStream[partial_types.Construct, types.Construct]:
       options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
       __tb__ = options.get("tb", None)
       if __tb__ is not None:
@@ -421,11 +214,9 @@ class BamlStreamClient:
       collector = options.get("collector", None)
       collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
       raw = self.__runtime.stream_function(
-        "GenerateEmailResponse",
+        "GenerateConstruct",
         {
-          "email_content": email_content,
-          "response_type": response_type,
-          "context": context,
+          "promptReq": promptReq,
         },
         None,
         self.__ctx_manager.get(),
@@ -434,44 +225,10 @@ class BamlStreamClient:
         collectors,
       )
 
-      return baml_py.BamlStream[partial_types.EmailResponse, types.EmailResponse](
+      return baml_py.BamlStream[partial_types.Construct, types.Construct](
         raw,
-        lambda x: cast(partial_types.EmailResponse, x.cast_to(types, types, partial_types, True)),
-        lambda x: cast(types.EmailResponse, x.cast_to(types, types, partial_types, False)),
-        self.__ctx_manager.get(),
-      )
-    
-    def PrioritizeEmails(
-        self,
-        emails: str,user_preferences: Optional[str],
-        baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[List[partial_types.EmailSummary], List[types.EmailSummary]]:
-      options: BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
-      __tb__ = options.get("tb", None)
-      if __tb__ is not None:
-        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
-      else:
-        tb = None
-      __cr__ = options.get("client_registry", None)
-      collector = options.get("collector", None)
-      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
-      raw = self.__runtime.stream_function(
-        "PrioritizeEmails",
-        {
-          "emails": emails,
-          "user_preferences": user_preferences,
-        },
-        None,
-        self.__ctx_manager.get(),
-        tb,
-        __cr__,
-        collectors,
-      )
-
-      return baml_py.BamlStream[List[partial_types.EmailSummary], List[types.EmailSummary]](
-        raw,
-        lambda x: cast(List[partial_types.EmailSummary], x.cast_to(types, types, partial_types, True)),
-        lambda x: cast(List[types.EmailSummary], x.cast_to(types, types, partial_types, False)),
+        lambda x: cast(partial_types.Construct, x.cast_to(types, types, partial_types, True)),
+        lambda x: cast(types.Construct, x.cast_to(types, types, partial_types, False)),
         self.__ctx_manager.get(),
       )
     

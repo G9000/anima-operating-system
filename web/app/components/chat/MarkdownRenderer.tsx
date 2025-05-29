@@ -165,7 +165,7 @@ export function MarkdownRenderer({
   return (
     <div
       className={cn(
-        "font-sans text-sm text-primary prose prose-sm prose-invert max-w-none",
+        "font-sans text-sm text-primary prose prose-sm max-w-none",
         "prose-p:my-1.5 prose-headings:text-primary prose-headings:font-bold prose-headings:my-2",
         "prose-code:text-primary",
         "prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0",
@@ -175,7 +175,6 @@ export function MarkdownRenderer({
         "prose-blockquote:border-l-2 prose-blockquote:border-primary/40 prose-blockquote:pl-3 prose-blockquote:italic prose-blockquote:my-3 prose-blockquote:text-primary/80",
         "prose-hr:border-primary/30 prose-hr:my-3",
         "prose-th:p-2 prose-td:border-y prose-td:border-primary/30 prose-td:p-1.5",
-        // Conditional classes
         isUser && "md-content-user",
         isStreaming && "streaming-content min-h-[24px]",
         className

@@ -22,48 +22,80 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(_TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["EmailAnalysis","EmailResponse","EmailSummary","Resume",]
+          ["Archetype","Behavior","Construct","Demographic","Identity","LLMTuning","LifeStyle","Lore","Psychographics","Resume","VisualProfile","Voice",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
 
 
     @property
-    def EmailAnalysis(self) -> "EmailAnalysisAst":
-        return EmailAnalysisAst(self)
+    def Archetype(self) -> "ArchetypeAst":
+        return ArchetypeAst(self)
 
     @property
-    def EmailResponse(self) -> "EmailResponseAst":
-        return EmailResponseAst(self)
+    def Behavior(self) -> "BehaviorAst":
+        return BehaviorAst(self)
 
     @property
-    def EmailSummary(self) -> "EmailSummaryAst":
-        return EmailSummaryAst(self)
+    def Construct(self) -> "ConstructAst":
+        return ConstructAst(self)
+
+    @property
+    def Demographic(self) -> "DemographicAst":
+        return DemographicAst(self)
+
+    @property
+    def Identity(self) -> "IdentityAst":
+        return IdentityAst(self)
+
+    @property
+    def LLMTuning(self) -> "LLMTuningAst":
+        return LLMTuningAst(self)
+
+    @property
+    def LifeStyle(self) -> "LifeStyleAst":
+        return LifeStyleAst(self)
+
+    @property
+    def Lore(self) -> "LoreAst":
+        return LoreAst(self)
+
+    @property
+    def Psychographics(self) -> "PsychographicsAst":
+        return PsychographicsAst(self)
 
     @property
     def Resume(self) -> "ResumeAst":
         return ResumeAst(self)
 
+    @property
+    def VisualProfile(self) -> "VisualProfileAst":
+        return VisualProfileAst(self)
+
+    @property
+    def Voice(self) -> "VoiceAst":
+        return VoiceAst(self)
 
 
 
 
-class EmailAnalysisAst:
+
+class ArchetypeAst:
     def __init__(self, tb: _TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
-        self._bldr = _tb.class_("EmailAnalysis")
-        self._properties: typing.Set[str] = set([ "summary",  "key_points",  "sentiment",  "urgency",  "requires_response",  "suggested_actions", ])
-        self._props = EmailAnalysisProperties(self._bldr, self._properties)
+        self._bldr = _tb.class_("Archetype")
+        self._properties: typing.Set[str] = set([ "archetype_class",  "trope_tags", ])
+        self._props = ArchetypeProperties(self._bldr, self._properties)
 
     def type(self) -> FieldType:
         return self._bldr.field()
 
     @property
-    def props(self) -> "EmailAnalysisProperties":
+    def props(self) -> "ArchetypeProperties":
         return self._props
 
 
-class EmailAnalysisViewer(EmailAnalysisAst):
+class ArchetypeViewer(ArchetypeAst):
     def __init__(self, tb: _TypeBuilder):
         super().__init__(tb)
 
@@ -73,7 +105,7 @@ class EmailAnalysisViewer(EmailAnalysisAst):
 
 
 
-class EmailAnalysisProperties:
+class ArchetypeProperties:
     def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
         self.__bldr = bldr
         self.__properties = properties
@@ -81,47 +113,31 @@ class EmailAnalysisProperties:
     
 
     @property
-    def summary(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("summary"))
+    def archetype_class(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("archetype_class"))
 
     @property
-    def key_points(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("key_points"))
-
-    @property
-    def sentiment(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("sentiment"))
-
-    @property
-    def urgency(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("urgency"))
-
-    @property
-    def requires_response(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("requires_response"))
-
-    @property
-    def suggested_actions(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("suggested_actions"))
+    def trope_tags(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("trope_tags"))
 
     
 
-class EmailResponseAst:
+class BehaviorAst:
     def __init__(self, tb: _TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
-        self._bldr = _tb.class_("EmailResponse")
-        self._properties: typing.Set[str] = set([ "tone",  "content",  "subject", ])
-        self._props = EmailResponseProperties(self._bldr, self._properties)
+        self._bldr = _tb.class_("Behavior")
+        self._properties: typing.Set[str] = set([ "behavior_arc",  "refusal_style",  "trigger_to_help",  "mannerisms",  "quirks", ])
+        self._props = BehaviorProperties(self._bldr, self._properties)
 
     def type(self) -> FieldType:
         return self._bldr.field()
 
     @property
-    def props(self) -> "EmailResponseProperties":
+    def props(self) -> "BehaviorProperties":
         return self._props
 
 
-class EmailResponseViewer(EmailResponseAst):
+class BehaviorViewer(BehaviorAst):
     def __init__(self, tb: _TypeBuilder):
         super().__init__(tb)
 
@@ -131,7 +147,7 @@ class EmailResponseViewer(EmailResponseAst):
 
 
 
-class EmailResponseProperties:
+class BehaviorProperties:
     def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
         self.__bldr = bldr
         self.__properties = properties
@@ -139,35 +155,43 @@ class EmailResponseProperties:
     
 
     @property
-    def tone(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("tone"))
+    def behavior_arc(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("behavior_arc"))
 
     @property
-    def content(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("content"))
+    def refusal_style(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("refusal_style"))
 
     @property
-    def subject(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("subject"))
+    def trigger_to_help(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("trigger_to_help"))
+
+    @property
+    def mannerisms(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("mannerisms"))
+
+    @property
+    def quirks(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("quirks"))
 
     
 
-class EmailSummaryAst:
+class ConstructAst:
     def __init__(self, tb: _TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
-        self._bldr = _tb.class_("EmailSummary")
-        self._properties: typing.Set[str] = set([ "id",  "sender",  "subject",  "date",  "snippet",  "importance",  "category",  "action_needed",  "deadline", ])
-        self._props = EmailSummaryProperties(self._bldr, self._properties)
+        self._bldr = _tb.class_("Construct")
+        self._properties: typing.Set[str] = set([ "identity",  "archetype",  "demographic",  "psychographics",  "behavior",  "visual_profile",  "voice",  "lore",  "lifestyle",  "llm_tuning", ])
+        self._props = ConstructProperties(self._bldr, self._properties)
 
     def type(self) -> FieldType:
         return self._bldr.field()
 
     @property
-    def props(self) -> "EmailSummaryProperties":
+    def props(self) -> "ConstructProperties":
         return self._props
 
 
-class EmailSummaryViewer(EmailSummaryAst):
+class ConstructViewer(ConstructAst):
     def __init__(self, tb: _TypeBuilder):
         super().__init__(tb)
 
@@ -177,7 +201,7 @@ class EmailSummaryViewer(EmailSummaryAst):
 
 
 
-class EmailSummaryProperties:
+class ConstructProperties:
     def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
         self.__bldr = bldr
         self.__properties = properties
@@ -185,40 +209,360 @@ class EmailSummaryProperties:
     
 
     @property
-    def id(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("id"))
+    def identity(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("identity"))
 
     @property
-    def sender(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("sender"))
+    def archetype(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("archetype"))
 
     @property
-    def subject(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("subject"))
+    def demographic(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("demographic"))
 
     @property
-    def date(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("date"))
+    def psychographics(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("psychographics"))
 
     @property
-    def snippet(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("snippet"))
+    def behavior(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("behavior"))
 
     @property
-    def importance(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("importance"))
+    def visual_profile(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("visual_profile"))
 
     @property
-    def category(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("category"))
+    def voice(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("voice"))
 
     @property
-    def action_needed(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("action_needed"))
+    def lore(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("lore"))
 
     @property
-    def deadline(self) -> ClassPropertyViewer:
-        return ClassPropertyViewer(self.__bldr.property("deadline"))
+    def lifestyle(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("lifestyle"))
+
+    @property
+    def llm_tuning(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("llm_tuning"))
+
+    
+
+class DemographicAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Demographic")
+        self._properties: typing.Set[str] = set([ "gender",  "age",  "race_species",  "birthday",  "birthplace",  "height",  "weight", ])
+        self._props = DemographicProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "DemographicProperties":
+        return self._props
+
+
+class DemographicViewer(DemographicAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class DemographicProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def gender(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("gender"))
+
+    @property
+    def age(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("age"))
+
+    @property
+    def race_species(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("race_species"))
+
+    @property
+    def birthday(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("birthday"))
+
+    @property
+    def birthplace(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("birthplace"))
+
+    @property
+    def height(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("height"))
+
+    @property
+    def weight(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("weight"))
+
+    
+
+class IdentityAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Identity")
+        self._properties: typing.Set[str] = set([ "name",  "alias",  "role",  "tags", ])
+        self._props = IdentityProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "IdentityProperties":
+        return self._props
+
+
+class IdentityViewer(IdentityAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class IdentityProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def name(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("name"))
+
+    @property
+    def alias(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("alias"))
+
+    @property
+    def role(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("role"))
+
+    @property
+    def tags(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("tags"))
+
+    
+
+class LLMTuningAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("LLMTuning")
+        self._properties: typing.Set[str] = set([ "temperature",  "top_p",  "presence_penalty",  "frequency_penalty", ])
+        self._props = LLMTuningProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "LLMTuningProperties":
+        return self._props
+
+
+class LLMTuningViewer(LLMTuningAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class LLMTuningProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def temperature(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("temperature"))
+
+    @property
+    def top_p(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("top_p"))
+
+    @property
+    def presence_penalty(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("presence_penalty"))
+
+    @property
+    def frequency_penalty(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("frequency_penalty"))
+
+    
+
+class LifeStyleAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("LifeStyle")
+        self._properties: typing.Set[str] = set([ "occupation",  "hobbies",  "interests",  "favorite_foods",  "dislikes",  "daily_routine", ])
+        self._props = LifeStyleProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "LifeStyleProperties":
+        return self._props
+
+
+class LifeStyleViewer(LifeStyleAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class LifeStyleProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def occupation(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("occupation"))
+
+    @property
+    def hobbies(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("hobbies"))
+
+    @property
+    def interests(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("interests"))
+
+    @property
+    def favorite_foods(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("favorite_foods"))
+
+    @property
+    def dislikes(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("dislikes"))
+
+    @property
+    def daily_routine(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("daily_routine"))
+
+    
+
+class LoreAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Lore")
+        self._properties: typing.Set[str] = set([ "backstory",  "defining_moments", ])
+        self._props = LoreProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "LoreProperties":
+        return self._props
+
+
+class LoreViewer(LoreAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class LoreProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def backstory(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("backstory"))
+
+    @property
+    def defining_moments(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("defining_moments"))
+
+    
+
+class PsychographicsAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Psychographics")
+        self._properties: typing.Set[str] = set([ "personality_summary",  "core_values",  "fears",  "desires",  "beliefs", ])
+        self._props = PsychographicsProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "PsychographicsProperties":
+        return self._props
+
+
+class PsychographicsViewer(PsychographicsAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class PsychographicsProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def personality_summary(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("personality_summary"))
+
+    @property
+    def core_values(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("core_values"))
+
+    @property
+    def fears(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("fears"))
+
+    @property
+    def desires(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("desires"))
+
+    @property
+    def beliefs(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("beliefs"))
 
     
 
@@ -269,6 +613,106 @@ class ResumeProperties:
     @property
     def skills(self) -> ClassPropertyViewer:
         return ClassPropertyViewer(self.__bldr.property("skills"))
+
+    
+
+class VisualProfileAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("VisualProfile")
+        self._properties: typing.Set[str] = set([ "body",  "features",  "style",  "aura", ])
+        self._props = VisualProfileProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "VisualProfileProperties":
+        return self._props
+
+
+class VisualProfileViewer(VisualProfileAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class VisualProfileProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def body(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("body"))
+
+    @property
+    def features(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("features"))
+
+    @property
+    def style(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("style"))
+
+    @property
+    def aura(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("aura"))
+
+    
+
+class VoiceAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Voice")
+        self._properties: typing.Set[str] = set([ "tone",  "speech_style",  "pov",  "accent", ])
+        self._props = VoiceProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "VoiceProperties":
+        return self._props
+
+
+class VoiceViewer(VoiceAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class VoiceProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def tone(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("tone"))
+
+    @property
+    def speech_style(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("speech_style"))
+
+    @property
+    def pov(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("pov"))
+
+    @property
+    def accent(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("accent"))
 
     
 

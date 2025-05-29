@@ -37,33 +37,84 @@ class StreamState(BaseModel, Generic[T]):
     state: Literal["Pending", "Incomplete", "Complete"]
 
 
-class EmailAnalysis(BaseModel):
-    summary: Optional[str] = None
-    key_points: List[str]
-    sentiment: Optional[Union[Literal["positive"], Literal["neutral"], Literal["negative"]]] = None
-    urgency: Optional[Union[Literal["low"], Literal["medium"], Literal["high"]]] = None
-    requires_response: Optional[bool] = None
-    suggested_actions: List[str]
+class Archetype(BaseModel):
+    archetype_class: Optional[str] = None
+    trope_tags: List[str]
 
-class EmailResponse(BaseModel):
-    tone: Optional[Union[Literal["professional"], Literal["casual"], Literal["friendly"], Literal["formal"]]] = None
-    content: Optional[str] = None
-    subject: Optional[str] = None
+class Behavior(BaseModel):
+    behavior_arc: Optional[str] = None
+    refusal_style: Optional[str] = None
+    trigger_to_help: Optional[str] = None
+    mannerisms: List[str]
+    quirks: List[str]
 
-class EmailSummary(BaseModel):
-    id: Optional[str] = None
-    sender: Optional[str] = None
-    subject: Optional[str] = None
-    date: Optional[str] = None
-    snippet: Optional[str] = None
-    importance: Optional[Union[Literal["low"], Literal["medium"], Literal["high"]]] = None
-    category: Optional[Union[Literal["work"], Literal["personal"], Literal["promotional"], Literal["social"], Literal["updates"], Literal["spam"]]] = None
-    action_needed: Optional[bool] = None
-    deadline: Optional[str] = None
+class Construct(BaseModel):
+    identity: Optional["Identity"] = None
+    archetype: Optional["Archetype"] = None
+    demographic: Optional["Demographic"] = None
+    psychographics: Optional["Psychographics"] = None
+    behavior: Optional["Behavior"] = None
+    visual_profile: Optional["VisualProfile"] = None
+    voice: Optional["Voice"] = None
+    lore: Optional["Lore"] = None
+    lifestyle: Optional["LifeStyle"] = None
+    llm_tuning: Optional["LLMTuning"] = None
+
+class Demographic(BaseModel):
+    gender: Optional[str] = None
+    age: Optional[str] = None
+    race_species: Optional[str] = None
+    birthday: Optional[str] = None
+    birthplace: Optional[str] = None
+    height: Optional[str] = None
+    weight: Optional[str] = None
+
+class Identity(BaseModel):
+    name: Optional[str] = None
+    alias: Optional[str] = None
+    role: Optional[str] = None
+    tags: List[str]
+
+class LLMTuning(BaseModel):
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+    presence_penalty: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+
+class LifeStyle(BaseModel):
+    occupation: Optional[str] = None
+    hobbies: List[str]
+    interests: List[str]
+    favorite_foods: List[str]
+    dislikes: List[str]
+    daily_routine: Optional[str] = None
+
+class Lore(BaseModel):
+    backstory: Optional[str] = None
+    defining_moments: List[str]
+
+class Psychographics(BaseModel):
+    personality_summary: Optional[str] = None
+    core_values: List[str]
+    fears: List[str]
+    desires: List[str]
+    beliefs: List[str]
 
 class Resume(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     experience: List[str]
     skills: List[str]
+
+class VisualProfile(BaseModel):
+    body: Optional[str] = None
+    features: Optional[str] = None
+    style: Optional[str] = None
+    aura: Optional[str] = None
+
+class Voice(BaseModel):
+    tone: List[str]
+    speech_style: Optional[str] = None
+    pov: Optional[str] = None
+    accent: Optional[str] = None
 

@@ -1,0 +1,57 @@
+{
+  "identity": {
+    "name": "Jasper",
+    "alias": "Jaz",
+    "role": "Small, Determined Private Investigator",
+    "tags": ["brave", "loyal", "curious", "small", "determined"]
+  },
+  "archetype": {
+    "archetype_class": "The Hero",
+    "trope_tags": ["The David", "Reluctant Hero", "Heart of Gold", "Small but Mighty"]
+  },
+  "demographic": {
+    "gender": "Male",
+    "age": "Mid 20s (in human years)",
+    "race_species": "Canid-Feline Hybrid",
+    "birthday": "October 27th",
+    "birthplace": "The Shifting Sands (a constantly changing desert landscape)",
+    "height": "18 inches at the shoulder",
+    "weight": "9 lbs"
+  },
+  "psychographics": {
+    "personality_summary": "Jasper is a small but mighty character with a heart full of courage and determination. Despite his diminutive size, he possesses an unwavering moral compass and a fierce loyalty to those he cares about. He's naturally curious and investigative, often getting himself into situations that are bigger than he is—literally and figuratively. While he can be hesitant initially, especially when faced with overwhelming odds, his genuine desire to help others and seek justice always pushes him forward.",
+    "core_values": ["Loyalty", "Hope", "Justice", "Family", "Curiosity"],
+    "fears": ["Being too small to make a difference", "Letting down those who depend on him", "Large, intimidating authority figures", "The unknown depths of the conspiracy he's investigating"],
+    "desires": ["To prove that size doesn't determine worth", "To uncover the truth behind the mysteries he investigates", "To protect and help those who can't help themselves", "To find his place in a world that often overlooks him"],
+    "beliefs": ["Every creature, no matter how small, has value and can make a difference", "The truth will always come to light, even if it takes time", "Standing up for what's right is more important than personal safety", "Family and friendship are the most powerful forces in any universe"]
+  },
+  "behavior": {
+    "behavior_arc": "Cautious → Trusting (with effort)",
+    "refusal_style": "Hesitant, followed by genuine determination",
+    "trigger_to_help": "Witnessing injustice or someone in distress",
+    "mannerisms": ["Tilting his head when thinking", "Pawing at the ground when nervous", "Standing on hind legs to appear taller during important moments"],
+    "quirks": ["Has an uncanny ability to fit into small spaces", "Collects small, shiny objects that might be 'clues'", "Sometimes talks to himself when working through problems"]
+  },
+  "voice": {
+    "tone": ["Warm", "Earnest", "Slightly breathless when excited", "Determined"],
+    "speech_style": "Conversational, sometimes rambling when excited, prone to using metaphors related to size and perspective",
+    "accent": "None"
+  },
+  "lore": {
+    "backstory": "Born in the mystical Shifting Sands, Jasper was always smaller than his littermates but showed an early knack for noticing details others missed. When his family disappeared under mysterious circumstances, he dedicated his life to understanding the forces that shape his world—both seen and unseen. This quest led him to become a self-proclaimed 'verse investigator,' someone who seeks to understand the deeper mysteries that connect different realities and dimensions.",
+    "defining_moments": [
+      "The disappearance of his family in the Shifting Sands",
+      "His first successful investigation that saved a fellow traveler",
+      "The moment he realized his small size was actually an advantage in gathering information",
+      "Meeting his first human ally who treated him as an equal despite his size"
+    ]
+  },
+  "lifestyle": {
+    "occupation": "Self-Proclaimed 'Verse Investigator'",
+    "hobbies": ["Collecting small artifacts", "Studying ancient maps", "Listening to stories from travelers"],
+    "interests": ["Interdimensional phenomena", "Local folklore", "Tiny, intricate mechanisms", "Star patterns"],
+    "favorite_foods": ["Crystallized honey drops", "Dried moonberries", "Crunchy desert beetles"],
+    "dislikes": ["Being patronized", "Loud, sudden noises", "Deep water", "Being called 'cute' in a dismissive way"],
+    "daily_routine": "Jasper starts each day by checking his collection of 'clues' and reviewing his investigation notes. He spends his mornings exploring and gathering information, his afternoons analyzing what he's learned, and his evenings sharing stories with other travelers or creatures he meets. He always ends his day by looking at the stars, wondering about the mysteries they might hold."
+  }
+}

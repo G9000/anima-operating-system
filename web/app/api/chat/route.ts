@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		const accessToken = session?.access_token;
+		console.log("Access Token:", accessToken);
 		if (!accessToken) {
 			return NextResponse.json(
 				{ error: "Unauthorized: No access token found" },

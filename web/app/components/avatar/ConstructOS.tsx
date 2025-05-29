@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   Search,
@@ -11,16 +12,8 @@ import {
   Settings,
   Shield,
 } from "lucide-react";
-import {
-  Button,
-  Input,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/app/components/base";
+import { Button, Input } from "@/app/components/base";
 import { ConstructCard } from "./ConstructCard";
-import { ConstructCreator } from "./ConstructCreator";
 import type { Construct, CreateConstructData } from "./types";
 
 // Mock data for constructs (friends)
@@ -179,8 +172,8 @@ const mockConstructs: Construct[] = [
 export const AvatarOS = () => {
   const [constructs, setConstructs] = useState(mockConstructs);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showCreator, setShowCreator] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const router = useRouter();
 
   const filteredConstructs = constructs.filter((construct) => {
     const matchesSearch =
@@ -193,15 +186,9 @@ export const AvatarOS = () => {
 
     return matchesSearch && matchesFilter;
   });
-  const handleCreateConstruct = (constructData: CreateConstructData) => {
-    const newConstruct: Construct = {
-      id: Date.now().toString(),
-      ...constructData,
-      status: "active",
-      lastUsed: "Just created",
-    };
-    setConstructs([...constructs, newConstruct]);
-    setShowCreator(false);
+  const handleCreateConstruct = () => {
+    // Navigate to the create page instead of opening a dialog
+    router.push("/constructs/create");
   };
 
   return (
@@ -214,16 +201,16 @@ export const AvatarOS = () => {
             <div>
               <h1 className="text-2xl font-mono font-semibold text-foreground tracking-tight">
                 Construct Collective
-              </h1>
+              </h1>{" "}
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 <p className="text-foreground/60 font-mono text-sm">
                   4 constructs online
                 </p>
               </div>
-            </div>
+            </div>{" "}
             <Button
-              onClick={() => setShowCreator(true)}
+              onClick={handleCreateConstruct}
               className="font-mono gap-2"
               variant="outline"
             >
@@ -308,10 +295,10 @@ export const AvatarOS = () => {
                 {searchQuery
                   ? "Try adjusting your search criteria"
                   : "Create your first construct friend to get started"}
-              </p>
+              </p>{" "}
               {!searchQuery && (
                 <Button
-                  onClick={() => setShowCreator(true)}
+                  onClick={handleCreateConstruct}
                   className="font-mono gap-2"
                 >
                   <Plus className="w-4 h-4" />
@@ -347,25 +334,11 @@ export const AvatarOS = () => {
                     );
                   }}
                 />
-              ))}
+              ))}{" "}
             </div>
           )}
         </div>
       </div>
-      {/* Construct Creator Dialog */}
-      <Dialog open={showCreator} onOpenChange={setShowCreator}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-mono">
-              Meet a New Construct Friend
-            </DialogTitle>
-          </DialogHeader>
-          <ConstructCreator
-            onSave={handleCreateConstruct}
-            onCancel={() => setShowCreator(false)}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

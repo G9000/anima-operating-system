@@ -26,4 +26,38 @@ export interface CreateConstructData {
   canControlOS: boolean;
   personalityTraits: string[];
   favoriteActivities: string[];
+  // Optional fields
+  alias?: string;
+  tags?: string[];
+  archetype?: string;
+  archetypeTraits?: string[];
+  gender?: string;
+  age?: string;
+  species?: string;
+  birthday?: string;
+  birthplace?: string;
+  height?: string;
+  weight?: string;
+  personalitySummary?: string;
+  coreValues?: string[];
+  fears?: string[];
+  desires?: string[];
+  beliefs?: string[];
+  behaviorArc?: string;
+  refusalStyle?: string;
+  triggerToHelp?: string;
+  mannerisms?: string[];
+  quirks?: string[];
+  speechTones?: string[];
+  speechStyle?: string;
+  accent?: string;
+  backstory?: string;
+  definingMoments?: string[];
+  occupation?: string;
+  hobbies?: string[];
+  interests?: string[];
+  favoriteFoods?: string[];
+  dislikes?: string[];
+  dailyRoutine?: string;
+  psychologicalTraits?: string[];
 }

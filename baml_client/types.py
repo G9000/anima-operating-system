@@ -41,33 +41,84 @@ def all_succeeded(checks: Dict[CheckName, Check]) -> bool:
 
 
 
-class EmailAnalysis(BaseModel):
-    summary: str
-    key_points: List[str]
-    sentiment: Union[Literal["positive"], Literal["neutral"], Literal["negative"]]
-    urgency: Union[Literal["low"], Literal["medium"], Literal["high"]]
-    requires_response: bool
-    suggested_actions: List[str]
+class Archetype(BaseModel):
+    archetype_class: str
+    trope_tags: List[str]
 
-class EmailResponse(BaseModel):
-    tone: Union[Literal["professional"], Literal["casual"], Literal["friendly"], Literal["formal"]]
-    content: str
-    subject: Optional[str] = None
+class Behavior(BaseModel):
+    behavior_arc: str
+    refusal_style: str
+    trigger_to_help: str
+    mannerisms: List[str]
+    quirks: List[str]
 
-class EmailSummary(BaseModel):
-    id: str
-    sender: str
-    subject: str
-    date: str
-    snippet: str
-    importance: Union[Literal["low"], Literal["medium"], Literal["high"]]
-    category: Union[Literal["work"], Literal["personal"], Literal["promotional"], Literal["social"], Literal["updates"], Literal["spam"]]
-    action_needed: bool
-    deadline: Optional[str] = None
+class Construct(BaseModel):
+    identity: "Identity"
+    archetype: "Archetype"
+    demographic: "Demographic"
+    psychographics: "Psychographics"
+    behavior: "Behavior"
+    visual_profile: "VisualProfile"
+    voice: "Voice"
+    lore: "Lore"
+    lifestyle: "LifeStyle"
+    llm_tuning: "LLMTuning"
+
+class Demographic(BaseModel):
+    gender: str
+    age: str
+    race_species: str
+    birthday: Optional[str] = None
+    birthplace: Optional[str] = None
+    height: Optional[str] = None
+    weight: Optional[str] = None
+
+class Identity(BaseModel):
+    name: str
+    alias: Optional[str] = None
+    role: str
+    tags: List[str]
+
+class LLMTuning(BaseModel):
+    temperature: float
+    top_p: float
+    presence_penalty: float
+    frequency_penalty: float
+
+class LifeStyle(BaseModel):
+    occupation: str
+    hobbies: List[str]
+    interests: List[str]
+    favorite_foods: List[str]
+    dislikes: List[str]
+    daily_routine: Optional[str] = None
+
+class Lore(BaseModel):
+    backstory: str
+    defining_moments: List[str]
+
+class Psychographics(BaseModel):
+    personality_summary: str
+    core_values: List[str]
+    fears: List[str]
+    desires: List[str]
+    beliefs: List[str]
 
 class Resume(BaseModel):
     name: str
     email: str
     experience: List[str]
     skills: List[str]
+
+class VisualProfile(BaseModel):
+    body: str
+    features: str
+    style: str
+    aura: Optional[str] = None
+
+class Voice(BaseModel):
+    tone: List[str]
+    speech_style: str
+    pov: str
+    accent: Optional[str] = None
 
