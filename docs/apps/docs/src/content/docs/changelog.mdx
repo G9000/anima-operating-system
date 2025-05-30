@@ -1,0 +1,110 @@
+---
+title: "Changelog"
+---
+
+## v2.2.3 (Mar. 13, 2025)
+
+### Fixes
+
+- Resolve peer dependency mismatch (`unmet peer @astrojs/starlight@^0.31.1: found 0.32.x`)
+
+## v2.2.2 (Feb. 22, 2025)
+
+### Fixes
+
+- Removed old configuration options.
+
+## v2.2.1 (Feb. 22, 2025)
+
+### New Features
+
+- Re-added light mode support for the Ion theme.
+
+## v2.2.0 (Feb. 22, 2025)
+
+Fixed compatibility issues with Starlight v0.32.0.
+
+### Breaking Changes
+
+- Ion now requires Starlight v0.32.0 or higher.
+
+## v2.1.2 (Jan. 25, 2025)
+
+### Bug Fixes
+
+- The plugin configuration is now optional, allowing you to use Ion without any configuration.
+
+## v2.1.1 (Jan. 15, 2025)
+
+### Non-Breaking Changes
+
+Starting with this release, you no longer need to use the `resolve` function exported by the plugin to resolve the path to your local icon directory:
+
+```js del={11} ins={12}
+import { ion, resolve } from "starlight-ion-theme";
+
+export default defineConfig({
+  // ...
+  integrations: [
+    starlight({
+      // ...
+      plugins: [
+        ion({
+          icons: {
+            iconDir: resolve("./src/icons", import.meta.url),
+            iconDir: "./src/icons",
+          },
+        }),
+      ],
+    }),
+  ],
+});
+```
+
+It is recommended to stop using the function, as it has been marked as deprecated. For compatibility reasons, the function will still be exported from the package until the next minor release.
+
+## v2.1.0 (Jan. 12, 2025)
+
+### New Features
+
+- Exposes full configuration options for `astro-icon`
+- Allows for icons from `@iconify-json/*` packages to be used with the square bracket syntax
+
+### Breaking Changes
+
+The `iconDir` option has been removed in favor of the `icons` object, which now exposes `astro-icon`'s full configuration options.
+
+To migrate, update your `astro.config.mjs` file to the following:
+
+```js del={10} ins={11-13}
+import { ion, resolve } from "starlight-ion-theme";
+
+export default defineConfig({
+  // ...
+  integrations: [
+    starlight({
+      // ...
+      plugins: [
+        ion({
+          iconDir: resolve("./src/icons", import.meta.url),
+          icons: {
+            iconDir: resolve("./src/icons", import.meta.url),
+          },
+        }),
+      ],
+    }),
+  ],
+});
+```
+
+## v2.0.1 (Jan. 11, 2025)
+
+### Bug Fixes
+
+- Add missing files to npm release.
+
+## v2.0.0 (Jan. 11, 2025)
+
+### Breaking Changes
+
+- Refactored Ion into a Starlight plugin.
