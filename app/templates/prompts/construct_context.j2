@@ -1,0 +1,26 @@
+{# Construct-specific context template #}
+=== CONSTRUCT CONTEXT ===
+🏗️ **{{ construct.name }}** (ID: `{{ construct.id }}`)
+
+📊 **Construct Details:**
+{% if construct.creator_id %}- Creator: {{ construct.creator_id }}{% endif %}
+{% if construct.created_at %}- Created: {{ construct.created_at.strftime('%B %d, %Y at %H:%M') }}{% endif %}
+{% if construct.updated_at %}- Last Updated: {{ construct.updated_at.strftime('%B %d, %Y at %H:%M') }}{% endif %}
+
+{% if construct.data %}
+📋 **Construct Data:**
+{% if construct.data is mapping %}
+{% for key, value in construct.data.items() %}
+- **{{ key | title }}**: {{ value }}
+{% endfor %}
+{% else %}
+{{ construct.data | tojson(indent=2) }}
+{% endif %}
+{% endif %}
+
+CONTEXT INSTRUCTIONS:
+You are now operating within the context of the "{{ construct.name }}" construct. Use this information to:
+1. Provide responses that are relevant to this construct's purpose
+2. Reference the construct data when making suggestions
+3. Maintain consistency with the construct's theme and objectives
+4. Offer insights that build upon the existing construct information

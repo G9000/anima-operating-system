@@ -10,12 +10,12 @@ interface ChatMessage {
 interface ChatRequestBody {
 	model: string;
 	messages: ChatMessage[];
+	construct_id: string;
 	temperature?: number;
 	max_tokens?: number;
 	stream?: boolean;
 	thread_id?: string;
-	conversation_mode?: string;
-	persona_id?: string;
+	mode?: "chat" | "roleplay" | "journal" | "story" | "assist" | "silent";
 }
 
 const ANIMA_OS_CORE_URL =
@@ -29,13 +29,15 @@ function validateRequestBody(body: any): body is ChatRequestBody {
 		body.messages.every(
 			(msg: any) =>
 				typeof msg.role === "string" && typeof msg.content === "string",
-		)
+		) &&
+		typeof body.construct_id === "string"
 	);
 }
 
 export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json();
+		console.log("[Proxy] Received request body:", body);
 
 		if (!validateRequestBody(body)) {
 			return NextResponse.json(
@@ -59,7 +61,6 @@ export async function POST(request: NextRequest) {
 		}
 
 		const accessToken = session?.access_token;
-		console.log("Access Token:", accessToken);
 		if (!accessToken) {
 			return NextResponse.json(
 				{ error: "Unauthorized: No access token found" },
@@ -193,7 +194,6 @@ export async function POST(request: NextRequest) {
 	}
 }
 
-// Optional: Add OPTIONS method for CORS preflight
 export async function OPTIONS(request: NextRequest) {
 	return new NextResponse(null, {
 		status: 200,

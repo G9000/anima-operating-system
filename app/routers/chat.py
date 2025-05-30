@@ -26,8 +26,7 @@ async def chat_completions(
     result = await db.execute(select(User).filter(User.id == current_user_id))
     current_user = result.scalar_one_or_none()
     
-    if not current_user:
-        return JSONResponse(
+    if not current_user:        return JSONResponse(
             status_code=401,
             content={"error": "User not found"}
         )
@@ -35,6 +34,7 @@ async def chat_completions(
     langchain_messages = await ChatService.convert_chat_messages_to_langchain(
         request.messages,
         db,
+        request.construct_id,
         request.mode
     )
     

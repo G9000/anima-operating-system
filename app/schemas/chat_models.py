@@ -26,8 +26,9 @@ class ChatMessage(BaseModel):
     name: Optional[str] = None
 
 class ChatRequest(BaseModel):
-    model: str = "animaos-agent"
+    model: str = "gemma3:27b"
     messages: List[ChatMessage]
+    construct_id: uuid.UUID
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = None
     stream: Optional[bool] = False

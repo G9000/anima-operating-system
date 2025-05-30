@@ -1,0 +1,18 @@
+{# Agent mode enhanced template #}
+{{ load_instruction_file('chat/modes/' ~ mode ~ '_mode.txt') }}
+
+{# All guardrails loaded dynamically from files #}
+{% set construct_name = construct.name if construct else (construct_id or "Default Assistant") %}
+{% set pronoun_subject = construct.pronoun_subject if construct and construct.pronoun_subject else "they" %}
+
+{{ load_guardrails('identity', CONSTRUCT_NAME=construct_name, PRONOUN_SUBJECT=pronoun_subject) }}
+
+{{ load_guardrails('safety') }}
+
+{{ load_guardrails('system') }}
+
+{% include "prompts/construct_context.j2" %}
+
+{% if custom_instructions %}
+{{ custom_instructions }}
+{% endif %}
