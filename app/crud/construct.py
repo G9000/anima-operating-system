@@ -74,3 +74,88 @@ async def create_construct(
         logger.error(f"Error creating construct: {e}")
         await db.rollback()
         raise e
+
+async def update_construct(
+    db: AsyncSession,
+    construct_id: UUID,
+    construct_data: dict
+) -> Optional[Construct]:
+    """
+    Update a construct in the database.
+    
+    Args:
+        db (AsyncSession): The database session.
+        construct_id (UUID): The ID of the construct to update.
+        construct_data (dict): The data to update.
+    
+    Returns:
+        Optional[Construct]: The updated construct if found, otherwise None.
+    """
+    try:
+        result = await db.execute(select(Construct).where(Construct.id == construct_id))
+        construct = result.scalar_one_or_none()
+        
+        if not construct:
+            return None
+        
+        for key, value in construct_data.items():
+            if hasattr(construct, key):
+                setattr(construct, key, value)
+        
+        await db.commit()
+        await db.refresh(construct)
+        return construct
+    except Exception as e:
+        logger.error(f"Error updating construct {construct_id}: {e}")
+        await db.rollback()
+        raise e
+
+async def delete_construct(
+    db: AsyncSession,
+    construct_id: UUID
+) -> bool:
+    """
+    Delete a construct from the database.
+    
+    Args:
+        db (AsyncSession): The database session.
+        construct_id (UUID): The ID of the construct to delete.
+    
+    Returns:
+        bool: True if the construct was deleted, False if not found.
+    """
+    try:
+        result = await db.execute(select(Construct).where(Construct.id == construct_id))
+        construct = result.scalar_one_or_none()
+        
+        if not construct:
+            return False
+        
+        await db.delete(construct)
+        await db.commit()
+        return True
+    except Exception as e:
+        logger.error(f"Error deleting construct {construct_id}: {e}")
+        await db.rollback()
+        raise e
+
+async def get_constructs_by_creator(
+    db: AsyncSession,
+    creator_id: UUID
+) -> list[Construct]:
+    """
+    Retrieve all constructs created by a specific user.
+    
+    Args:
+        db (AsyncSession): The database session.
+        creator_id (UUID): The ID of the creator.
+    
+    Returns:
+        list[Construct]: A list of constructs created by the user.
+    """
+    try:
+        result = await db.execute(select(Construct).where(Construct.creator_id == creator_id))
+        return result.scalars().all()
+    except Exception as e:
+        logger.error(f"Error retrieving constructs for creator {creator_id}: {e}")
+        return []

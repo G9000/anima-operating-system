@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import chat
+from .routers import chat, construct
 
 
 # Load environment variables
@@ -13,6 +13,7 @@ except ImportError:
 app = FastAPI(title="AnimaOS", version="0.1.0")
 
 app.include_router(chat.router, tags=["chat"])
+app.include_router(construct.router, tags=["constructs"])
 
 @app.get("/")
 async def root():

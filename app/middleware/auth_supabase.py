@@ -13,10 +13,10 @@ auth_scheme = HTTPBearer()
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Security(auth_scheme)):
     token = credentials.credentials
+    print(f"Verifying token: {token}")
     try:
         payload = jwt.decode(token, SUPABASE_JWT_SECRET,
                              algorithms=[JWT_ALGORITHM], audience='authenticated')
-        print(f"Token payload: {payload}")  # Debugging line
         return payload
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
@@ -25,15 +25,12 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(auth_schem
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> UUID:
-    print(f"Received token: {credentials.credentials}")  # Debugging line
-    print(f"Using JWT algorithm: {JWT_ALGORITHM}")  # Debugging 
-    print(f"Using SUPABASE_JWT_SECRET algorithm: {SUPABASE_JWT_SECRET}")  # Debugging line
-    
+
     token = credentials.credentials
+    print(f"Verifying token: {token}")
     try:
         payload = jwt.decode(token, SUPABASE_JWT_SECRET,
                              algorithms=[JWT_ALGORITHM], audience='authenticated')
-        print(f"Decoded payload: {payload}")  # Debugging line
         user_id = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=403, detail="Invalid token")
