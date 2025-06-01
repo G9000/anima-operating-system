@@ -2,72 +2,53 @@
 Graph configuration presets for different chat scenarios.
 Provides pre-configured graph setups for common use cases.
 """
-from typing import List, Dict, Any
-from langchain_core.messages import BaseMessage, AIMessage, HumanMessage
+from langchain_core.messages import AIMessage
 
-from app.services.simple_graph_service import simple_graph_service
+from app.services.state_graph_service import state_graph_service
+from app.models.construct import Construct
+from app.services.template_service import template_service
 
 class GraphConfigService:
     """Service providing pre-configured graph setups."""
-    
+
     @staticmethod
-    def create_basic_chat_graph(model_name: str = "gemma3:27b"):
-        """Create a basic chat graph with standard configuration."""
-        llm_chain = simple_graph_service.create_llm_chain(
-            model_name=model_name,
-            system_message="You are a helpful AI assistant."
-        )
-        
-        return simple_graph_service.create_chat_graph(llm_chain=llm_chain)
-    
-    @staticmethod
-    def create_roleplay_chat_graph(
-        model_name: str = "gemma3:27b",
-        character_prompt: str = "You are a friendly character in a roleplay scenario."
+    def create_construct_chat_graph(
+        construct: "Construct",
+        chat_mode: str = "chat",
+        model_name: str = None,
     ):
-        """Create a roleplay-focused chat graph."""
-        llm_chain = simple_graph_service.create_llm_chain(
-            model_name=model_name,
-            system_message=character_prompt,
-            temperature=0.8  # Higher creativity for roleplay
+        """Create a graph configured for a specific construct and chat mode."""
+      
+        
+        # Use construct's preferred model or default
+        model_name = model_name or construct.llm_model or "gemma3:27b"
+        
+        # Generate system message based on construct and mode
+        system_message = template_service.generate_system_prompt(
+            construct=construct,
+            mode=chat_mode
         )
         
-        return simple_graph_service.create_chat_graph(llm_chain=llm_chain)
-    
-    @staticmethod
-    def create_assistant_chat_graph(
-        model_name: str = "gemma3:27b",
-        task_focus: str = "general assistance"
-    ):
-        """Create a task-focused assistant graph."""
-        system_prompt = f"""You are a helpful AI assistant focused on {task_focus}. 
-        You are direct, efficient, and provide practical solutions."""
+        # Set temperature based on mode and construct preferences
+        temperature = {
+            "chat": construct.temperature or 0.7,
+            "roleplay": max(construct.temperature or 0.8, 0.8),
+            "assist": min(construct.temperature or 0.3, 0.3),
+            "journal": max(construct.temperature or 0.9, 0.9),
+            "story": max(construct.temperature or 0.8, 0.8),
+            "silent": max(construct.temperature or 0.1, 0.1),
+        }.get(chat_mode, construct.temperature or 0.7)
         
-        llm_chain = simple_graph_service.create_llm_chain(
+        llm_chain = state_graph_service.create_llm_chain(
             model_name=model_name,
-            system_message=system_prompt,
-            temperature=0.3  # Lower temperature for more focused responses
+            system_message=system_message,
+            temperature=temperature,
+            top_p=construct.top_p,
+            repeat_penalty=construct.repeat_penalty
         )
         
-        return simple_graph_service.create_chat_graph(llm_chain=llm_chain)
-    
-    @staticmethod
-    def create_creative_chat_graph(
-        model_name: str = "gemma3:27b",
-        creative_focus: str = "storytelling"
-    ):
-        """Create a creativity-focused chat graph."""
-        system_prompt = f"""You are a creative AI assistant specializing in {creative_focus}. 
-        You are imaginative, expressive, and help users explore creative ideas."""
-        
-        llm_chain = simple_graph_service.create_llm_chain(
-            model_name=model_name,
-            system_message=system_prompt,
-            temperature=0.9  # High creativity
-        )
-        
-        return simple_graph_service.create_chat_graph(llm_chain=llm_chain)
-    
+        return state_graph_service.create_chat_graph(llm_chain=llm_chain)
+
     @staticmethod
     def create_multi_step_graph(model_name: str = "gemma3:27b"):
         """Create a multi-step reasoning graph."""
@@ -84,7 +65,7 @@ class GraphConfigService:
         
         def reasoning_node(state):
             """Node for detailed reasoning."""
-            llm_chain = simple_graph_service.create_llm_chain(
+            llm_chain = state_graph_service.create_llm_chain(
                 model_name=model_name,
                 system_message="You are an AI that provides detailed, step-by-step reasoning."
             )
@@ -96,7 +77,7 @@ class GraphConfigService:
         
         def conclusion_node(state):
             """Node for final conclusion."""
-            llm_chain = simple_graph_service.create_llm_chain(
+            llm_chain = state_graph_service.create_llm_chain(
                 model_name=model_name,
                 system_message="Provide a clear, concise conclusion based on the reasoning above."
             )
@@ -117,23 +98,13 @@ class GraphConfigService:
             ("reasoning", "conclusion")
         ]
         
-        return simple_graph_service.create_multi_node_graph(
+        return state_graph_service.create_multi_node_graph(
             nodes=nodes,
             edges=edges,
             start_node="thinking",
             end_nodes=["conclusion"]
         )
     
-    @staticmethod
-    def get_available_configs() -> Dict[str, str]:
-        """Get list of available graph configurations."""
-        return {
-            "basic": "Standard chat assistant",
-            "roleplay": "Character roleplay with higher creativity",
-            "assistant": "Task-focused assistant with lower temperature",
-            "creative": "Creative writing and ideation",
-            "multi_step": "Multi-step reasoning graph"
-        }
 
 
 # Global config service instance

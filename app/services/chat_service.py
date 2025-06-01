@@ -14,7 +14,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from fastapi.responses import StreamingResponse, JSONResponse
 
 from app.schemas.chat_models import ChatRequest, ChatMessage, ChatChoice, ChatUsage, ChatResponse
-from app.services.simple_graph_service import simple_graph_service
+from app.services.state_graph_service import state_graph_service
 from app.services.template_service import template_service
 from app.services.message_formatter import MessageFormatter
 from app.crud.construct import get_construct_by_id
@@ -96,7 +96,7 @@ class ChatService:
                     "temperature": request_data.get("temperature") or self._get_mode_temperature(mode),
                 }
                 
-                llm_chain = simple_graph_service.create_llm_chain(
+                llm_chain = state_graph_service.create_llm_chain(
                     model_name=request_data["model"],
                     system_message="", 
                     **model_kwargs

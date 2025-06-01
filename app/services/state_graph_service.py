@@ -16,7 +16,7 @@ class SimpleState(TypedDict):
     """State definition for the simple chat graph."""
     messages: Annotated[List[BaseMessage], add_messages]
 
-class SimpleGraphService:
+class StateGraphService:
     """Service for creating and managing LangGraph state graphs."""
     
     def __init__(self):
@@ -25,8 +25,9 @@ class SimpleGraphService:
     def create_chat_graph(
         self, 
         llm_chain,
-        system_message: str = "You are a helpful AI assistant. You are friendly, knowledgeable, and always try to be helpful.",
-        message_trimmer: Optional[Callable] = None
+        message_trimmer: Optional[Callable] = None,
+        error_handler: Optional[Callable] = None,
+        max_retries: int = 1
     ):
         """
         Create a chat graph with the provided LLM chain and configuration.
@@ -35,29 +36,41 @@ class SimpleGraphService:
             llm_chain: The LangChain LLM chain to use for responses
             system_message: System message for the chatbot
             message_trimmer: Optional function to trim messages for context window
+            error_handler: Optional custom error handler function
+            max_retries: Maximum number of retry attempts on error
         
         Returns:
             Compiled LangGraph with memory support
         """
         def chatbot_node(state: SimpleState):
             """Main chatbot processing node."""
-            try:
-                messages = state["messages"]
-                
-                # Apply message trimming if provided
-                if message_trimmer:
-                    messages = message_trimmer(messages)
-                
-                # Invoke the LLM chain
-                response = llm_chain.invoke({"messages": messages})
-                
-                return {"messages": [response]}
-                
-            except Exception as e:
-                print(f"❌ Error in chatbot node: {e}")
-                # Return error message
-                error_msg = AIMessage(content=f"Sorry, I encountered an error: {str(e)}")
-                return {"messages": [error_msg]}
+            for attempt in range(max_retries + 1):
+                try:
+                    messages = state["messages"]
+                    
+                    # Apply message trimming if provided
+                    if message_trimmer:
+                        messages = message_trimmer(messages)
+                    
+                    # Invoke the LLM chain
+                    response = llm_chain.invoke({"messages": messages})
+                    
+                    return {"messages": [response]}
+                    
+                except Exception as e:
+                    if attempt < max_retries:
+                        print(f"⚠️ Attempt {attempt + 1} failed: {e}, retrying...")
+                        continue
+                    
+                    print(f"❌ Error in chatbot node: {e}")
+                    
+                    # Use custom error handler if provided
+                    if error_handler:
+                        return error_handler(state, e)
+                    
+                    # Default error message
+                    error_msg = AIMessage(content=f"Sorry, I encountered an error: {str(e)}")
+                    return {"messages": [error_msg]}
         
         # Create the graph
         graph_builder = StateGraph(SimpleState)
@@ -166,7 +179,35 @@ class SimpleGraphService:
             # Clear all memory
             self.memory_saver = MemorySaver()
             print("🧹 All memory cleared")
+    
+    def validate_graph(self, graph):
+        """Validate that a graph is properly configured."""
+        try:
+            # Test with empty state
+            test_state = {"messages": []}
+            config = {"configurable": {"thread_id": "test"}}
+            
+            # Attempt to get initial state
+            graph.get_state(config)
+            
+            return True, "Graph validation successful"
+        except Exception as e:
+            return False, f"Graph validation failed: {str(e)}"
+    
+    def create_message_trimmer(self, max_messages: int = 20, preserve_system: bool = True):
+        """Create a message trimmer function for context window management."""
+        def trim_messages(messages: List[BaseMessage]) -> List[BaseMessage]:
+            if len(messages) <= max_messages:
+                return messages
+            
+            # Preserve system message if requested
+            if preserve_system and messages and messages[0].type == "system":
+                return [messages[0]] + messages[-(max_messages-1):]
+            
+            return messages[-max_messages:]
+        
+        return trim_messages
 
 
 # Global graph service instance
-simple_graph_service = SimpleGraphService()
+state_graph_service = StateGraphService()
