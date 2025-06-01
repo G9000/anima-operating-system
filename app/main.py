@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from .routers import chat, construct
+from .config.config import setup_logging
 
 
 # Load environment variables
@@ -9,6 +10,8 @@ try:
 except ImportError:
     pass
 
+# Setup logging
+setup_logging()
 
 app = FastAPI(title="AnimaOS", version="0.1.0")
 

@@ -19,11 +19,7 @@ class GraphConfigService:
     ):
         """Create a graph configured for a specific construct and chat mode."""
       
-        
-        # Use construct's preferred model or default
         model_name = model_name or construct.llm_model or "gemma3:27b"
-        
-        # Generate system message based on construct and mode
         system_message = template_service.generate_system_prompt(
             construct=construct,
             mode=chat_mode

@@ -127,15 +127,15 @@ class StateGraphService:
         self,
         model_name: str = "gemma3:27b",
         base_url: str = "http://localhost:11434",
-        system_message: str = "You are a helpful AI assistant.",
+        system_message: str = "You are Anima OS, a helpful AI assistant.",
         **model_kwargs
     ):
         """
         Create an LLM chain with the specified configuration.
         
         Args:
-            model_name: Name of the Ollama model
-            base_url: Base URL for Ollama
+            model_name: Name of the model
+            base_url: Base URL for LLM service
             system_message: System message for the prompt
             **model_kwargs: Additional model parameters
         
@@ -149,13 +149,11 @@ class StateGraphService:
             **model_kwargs
         )
         
-        # Create prompt template
         prompt_template = ChatPromptTemplate.from_messages([
             ("system", system_message),
             MessagesPlaceholder("messages")
         ])
         
-        # Create and return the chain
         return prompt_template | llm
     
     def get_memory_saver(self):
