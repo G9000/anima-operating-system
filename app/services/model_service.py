@@ -5,8 +5,10 @@ import json
 from typing import Tuple, Optional
 from langchain_ollama import ChatOllama
 from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import InMemorySaver
 
 
+checkpointer = InMemorySaver()
 
 class ModelService:
     """Service for managing AI models and agent creation."""
@@ -27,31 +29,28 @@ class ModelService:
         for model_name in models_to_try:
             try:
                 model = ChatOllama(model=model_name, base_url="http://localhost:11434")
-                # Test if the model supports tool binding
                 test_tools = [{"type": "function", "function": {"name": "test", "description": "test"}}]
                 try:
-                    # Try to bind tools to test support
                     model.bind_tools(test_tools)
-                    print(f"✅ Connected to Ollama with {model_name} (tool-capable)")
+                    print(f"Connected to Ollama with {model_name} (tool-capable)")
                     return model, True
                 except NotImplementedError:
-                    print(f"⚠️ {model_name} doesn't support tool binding, trying next model...")
+                    print(f"{model_name} doesn't support tool binding, trying next model...")
                     continue
                 except Exception as e:
-                    print(f"⚠️ Tool binding test failed for {model_name}: {e}")
-                    # Return the model anyway, might work with create_react_agent
+                    print(f"Tool binding test failed for {model_name}: {e}")
                     return model, False
             except Exception as e:
-                print(f"❌ Failed to connect to {model_name}: {e}")
+                print(f"Failed to connect to {model_name}: {e}")
                 continue
         
         # Fallback to basic model
         try:
             model = ChatOllama(model="llama3.1", base_url="http://localhost:11434")
-            print("⚠️ Using basic llama3.1 without tool support")
+            print("Using basic llama3.1 without tool support")
             return model, False
         except Exception as e:
-            print(f"❌ Failed to connect to any model: {e}")
+            print(f"Failed to connect to any model: {e}")
             return None, False
     
     def create_agent_executor(self, model_name: str = "devstral:latest"):
@@ -61,13 +60,35 @@ class ModelService:
         
         try:
             model = ChatOllama(model=model_name, base_url="http://localhost:11434")
+            
+            # Debug: Verify checkpointer state and usage
+            print(f"🧠 Creating agent with checkpointer: {type(checkpointer).__name__}")
+            print(f"🔗 Checkpointer instance ID: {id(checkpointer)}")
+            
+            # Try to inspect internal storage if possible
+            if hasattr(checkpointer, 'storage'):
+                print(f"📚 Current stored threads: {list(checkpointer.storage.keys())}")
+                print(f"📊 Total stored messages: {len(checkpointer.storage)}")
+            else:
+                print("📚 Checkpointer has no accessible storage attribute")
+                
+            # Try to inspect any internal state
+            try:
+                storage_data = vars(checkpointer)
+                print(f"🔍 Checkpointer internal state keys: {list(storage_data.keys())}")
+            except Exception as e:
+                print(f"🔍 Cannot inspect checkpointer state: {e}")
+            
             agent_executor = create_react_agent(
                 model=model,
                 tools=[],
+                checkpointer=checkpointer
             )
+            
+            print(f"✅ Agent created successfully with memory support")
             return agent_executor
         except Exception as e:
-            print(f"Agent creation failed: {e}")
+            print(f"❌ Agent creation failed: {e}")
             raise
     
     def is_available(self) -> bool:

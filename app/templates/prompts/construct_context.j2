@@ -1,14 +1,14 @@
 {# Construct-specific context template #}
 === CONSTRUCT CONTEXT ===
-🏗️ **{{ construct.name }}** (ID: `{{ construct.id }}`)
+**{{ construct.name }}** (ID: `{{ construct.id }}`)
 
-📊 **Construct Details:**
+**Construct Details:**
 {% if construct.creator_id %}- Creator: {{ construct.creator_id }}{% endif %}
 {% if construct.created_at %}- Created: {{ construct.created_at.strftime('%B %d, %Y at %H:%M') }}{% endif %}
 {% if construct.updated_at %}- Last Updated: {{ construct.updated_at.strftime('%B %d, %Y at %H:%M') }}{% endif %}
 
 {% if construct.data %}
-📋 **Construct Data:**
+**Construct Data:**
 {% if construct.data is mapping %}
 {% for key, value in construct.data.items() %}
 - **{{ key | title }}**: {{ value }}

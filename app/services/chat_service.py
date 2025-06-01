@@ -22,8 +22,7 @@ class ChatService:
     async def format_chat_history(
         request: AgentChatRequest, 
         db: AsyncSession = None
-    ) -> List[BaseMessage]:
-        return await MessageFormatter.format_chat_history(request, db)
+    ) -> List[BaseMessage]:        return await MessageFormatter.format_chat_history(request, db)
     
     @staticmethod
     async def convert_chat_messages_to_langchain(
@@ -31,5 +30,5 @@ class ChatService:
         db: AsyncSession,
         construct_id: uuid.UUID,
         mode: str = "chat"
-    ) -> List[BaseMessage]:
+    ) -> tuple[List[BaseMessage], Optional[str]]:
         return await MessageFormatter.convert_chat_messages_to_langchain(messages, db, construct_id, mode)

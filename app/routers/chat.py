@@ -26,40 +26,50 @@ async def chat_completions(
     result = await db.execute(select(User).filter(User.id == current_user_id))
     current_user = result.scalar_one_or_none()
     
-    if not current_user:        return JSONResponse(
+    if not current_user:
+        return JSONResponse(
             status_code=401,
             content={"error": "User not found"}
         )
     
-    langchain_messages = await ChatService.convert_chat_messages_to_langchain(
+    langchain_messages, system_prompt = await ChatService.convert_chat_messages_to_langchain(
         request.messages,
         db,
         request.construct_id,
         request.mode
     )
+
+    print('system_prompt:', system_prompt)
+    
+    if system_prompt:
+        from langchain_core.messages import SystemMessage
+        langchain_messages = [SystemMessage(content=system_prompt)] + langchain_messages
+    else:
+        print(f"⚠️ No system prompt generated")
     
     if not model_service.is_available():
-        return JSONResponse(
+                return JSONResponse(
             status_code=500,
             content={
                 "error": {
                     "message": "No model available. Please check Ollama is running.",
                     "type": "server_error",
-                    "code": 500
-                }
+                    "code": 500                }
             }
         )
     
     try:
-        agent_executor = model_service.create_agent_executor()
+        agent_executor = model_service.create_agent_executor(request.model)
+        memory_config = {"configurable": {"thread_id": request.thread_id}}
+
         
         if request.stream:
             return await ResponseHandler.stream_chat_response(
-                agent_executor, langchain_messages, request.model
+                agent_executor, langchain_messages, memory_config, request.model
             )
         else:
             return await ResponseHandler.sync_chat_response(
-                agent_executor, langchain_messages, request.model
+                agent_executor, langchain_messages, memory_config, request.model
             )
             
     except NotImplementedError as e:

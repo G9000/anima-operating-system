@@ -15,20 +15,53 @@ from app.services.model_service import model_service
 
 class ResponseHandler:
     """Handler for chat response generation."""
-    
     @staticmethod
     async def stream_chat_response(
         agent_executor: CompiledGraph, 
         messages: List[BaseMessage], 
+        config: dict,
         model_name: str
     ) -> StreamingResponse:
         """Generate streaming response."""
+        thread_id = config.get("configurable", {}).get("thread_id", "unknown")
+        print(f"🧠 Starting stream for thread_id: {thread_id}")
+        print(f"📝 Input messages: {len(messages)} message(s)")
+          # Debug: Check memory state before processing
+        try:
+            checkpointer = agent_executor.checkpointer
+            if checkpointer:
+                print(f"🔍 Checkpointer type: {type(checkpointer).__name__}")
+                print(f"🔍 Checkpointer ID: {id(checkpointer)}")
+                
+                # Try to get existing state
+                existing_state = await checkpointer.aget(config)
+                if existing_state and existing_state.values.get('messages'):
+                    print(f"💾 Found existing conversation: {len(existing_state.values['messages'])} messages in memory")
+                    for i, msg in enumerate(existing_state.values['messages'][-3:]):  # Show last 3
+                        print(f"  📜 {i}: {msg.__class__.__name__}: {msg.content[:50]}...")
+                else:
+                    print(f"🆕 No existing conversation found for thread_id: {thread_id}")
+                    
+                # Try to inspect checkpointer storage directly
+                if hasattr(checkpointer, 'storage'):
+                    print(f"📊 Checkpointer storage keys: {list(checkpointer.storage.keys())}")
+                    if thread_id in checkpointer.storage:
+                        print(f"✅ Thread {thread_id} exists in storage")
+                    else:
+                        print(f"❌ Thread {thread_id} NOT found in storage")
+                        print(f"🔍 Available threads: {list(checkpointer.storage.keys())[:5]}...")  # Show first 5
+            else:
+                print(f"⚠️ No checkpointer found in agent!")
+        except Exception as e:
+            print(f"❌ Error checking memory state: {e}")
+            import traceback
+            print(f"🔍 Full error: {traceback.format_exc()}")
+        
         response_id = f"chatcmpl-{uuid.uuid4().hex[:8]}"
         created_timestamp = int(datetime.now().timestamp())
         
         async def generate() -> AsyncGenerator[str, None]:
             try:
-                # Send initial chunk with role
                 yield f"data: {json.dumps({
                     'id': response_id,
                     'object': 'chat.completion.chunk',
@@ -41,12 +74,13 @@ class ResponseHandler:
                     }]
                 })}\n\n"
                 
-                # Stream content using the correct stream mode
+                
                 async for event in agent_executor.astream_events(
                     input={"messages": messages},
+                    config=config,
                     version="v2"
                 ):
-                    
+    
                     if event["event"] == "on_chat_model_stream":
                         content = event["data"]["chunk"].content
                         if content:
@@ -65,7 +99,6 @@ class ResponseHandler:
                     elif event["event"] == "on_chain_end":
                         pass
                 
-                # Send finish chunk
                 yield f"data: {json.dumps({
                     'id': response_id,
                     'object': 'chat.completion.chunk',
@@ -81,8 +114,6 @@ class ResponseHandler:
                 yield "data: [DONE]\n\n"
                 
             except Exception as e:
-                print(f"Streaming error: {e}")
-                # Send error in standard format
                 yield f"data: {json.dumps({
                     'id': response_id,
                     'object': 'chat.completion.chunk',
@@ -111,15 +142,17 @@ class ResponseHandler:
     async def sync_chat_response(
         agent_executor: CompiledGraph, 
         messages: List[BaseMessage], 
+        config: dict,
         model_name: str
     ) -> JSONResponse:
         """Generate synchronous response."""
         try:
+
             response = await agent_executor.ainvoke(
-                input={"messages": messages}
+                input={"messages": messages},
+                config=config,
             )
-            
-            # Extract assistant message from response
+        
             assistant_message = None
             for msg in reversed(response.get("messages", [])):
                 if isinstance(msg, AIMessage):
@@ -127,8 +160,7 @@ class ResponseHandler:
                     break
             
             content = assistant_message.content if assistant_message else "No response generated."
-            
-            # Estimate tokens (rough approximation)
+        
             prompt_tokens = sum(len(m.content.split()) * 1.3 for m in messages)
             completion_tokens = len(content.split()) * 1.3
             
@@ -152,6 +184,7 @@ class ResponseHandler:
                 }
             })
         except Exception as e:
+            print(f"❌ Sync response error: {e}")
             return JSONResponse(
                 status_code=500,
                 content={
@@ -178,11 +211,9 @@ class ResponseHandler:
             if stream:
                 return await ResponseHandler._fallback_stream_response(messages, model_name, model)
             else:
-                # Generate a response using the model directly
                 response = await model.ainvoke(messages)
                 content = response.content if hasattr(response, 'content') else str(response)
                 
-                # Estimate tokens (rough approximation)
                 prompt_tokens = sum(len(m.content.split()) * 1.3 for m in messages)
                 completion_tokens = len(content.split()) * 1.3
                 
@@ -195,7 +226,7 @@ class ResponseHandler:
                         "index": 0,
                         "message": {
                             "role": "assistant",
-                            "content": content + "\n\n📧 **Email functionality is available!** You can also use these direct API endpoints:\n• GET /v1/email/check - Check recent emails\n• GET /v1/email/folders - List email folders\n• GET /v1/email/config/test - Test email setup"
+                            "content": content
                         },
                         "finish_reason": "stop"
                     }],
@@ -229,7 +260,6 @@ class ResponseHandler:
         
         async def generate() -> AsyncGenerator[str, None]:
             try:
-                # Send initial chunk with role
                 yield f"data: {json.dumps({
                     'id': response_id,
                     'object': 'chat.completion.chunk',
@@ -242,11 +272,9 @@ class ResponseHandler:
                     }]
                 })}\n\n"
                 
-                # Get response from model
                 response = await model.ainvoke(messages)
                 content = response.content if hasattr(response, 'content') else str(response)
                 
-                # Stream the content in chunks
                 words = content.split()
                 for i, word in enumerate(words):
                     chunk_content = word + (" " if i < len(words) - 1 else "")
@@ -262,21 +290,6 @@ class ResponseHandler:
                         }]
                     })}\n\n"
                 
-                # Add email functionality note
-                email_note = "\n\n📧 **Email functionality is available!** You can also use these direct API endpoints:\n• GET /v1/email/check - Check recent emails\n• GET /v1/email/folders - List email folders\n• GET /v1/email/config/test - Test email setup"
-                yield f"data: {json.dumps({
-                    'id': response_id,
-                    'object': 'chat.completion.chunk',
-                    'created': created_timestamp,
-                    'model': model_name,
-                    'choices': [{
-                        'index': 0,
-                        'delta': {'content': email_note},
-                        'finish_reason': None
-                    }]
-                })}\n\n"
-                
-                # Send finish chunk
                 yield f"data: {json.dumps({
                     'id': response_id,
                     'object': 'chat.completion.chunk',
@@ -292,7 +305,7 @@ class ResponseHandler:
                 yield "data: [DONE]\n\n"
                 
             except Exception as e:
-                print(f"Fallback streaming error: {e}")
+                print(f"❌ Fallback streaming error: {e}")
                 yield f"data: {json.dumps({
                     'id': response_id,
                     'object': 'chat.completion.chunk',

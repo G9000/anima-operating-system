@@ -40,10 +40,11 @@ interface Persona {
 
 interface ChatInterfaceProps {
   className?: string;
+  threadId?: string;
 }
 
 const streamChat = async (
-  content: string,
+  messages: Array<{ role: string; content: string }>,
   threadId: string,
   personaId: string,
   conversationMode:
@@ -56,6 +57,10 @@ const streamChat = async (
   onChunk: (chunk: string) => void
 ) => {
   try {
+    console.log(
+      `🚀 Sending ${messages.length} messages with thread_id: ${threadId}`
+    );
+
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
@@ -64,16 +69,11 @@ const streamChat = async (
       },
       body: JSON.stringify({
         model: "gemma3:27b",
-        messages: [
-          {
-            role: "user",
-            content,
-          },
-        ],
+        messages: messages,
         temperature: 0.7,
         max_tokens: 0,
         stream: true,
-        thread_id: "aa22",
+        thread_id: threadId,
         mode: conversationMode,
         construct_id: "b40837f7-f1d3-4339-8fe0-a43e0ad2bf83",
       }),
@@ -129,7 +129,7 @@ const streamChat = async (
   }
 };
 
-export function ChatInterface({ className }: ChatInterfaceProps) {
+export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -138,30 +138,43 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
   );
   const [selectedPersona, setSelectedPersona] = useState("Assistant");
 
+  // Generate a consistent thread_id for this chat session
+  const [currentThreadId] = useState(() => {
+    // Use provided threadId or generate a new one for this session
+    const id =
+      threadId ||
+      `chat-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.log("🧠 Chat Interface using thread_id:", id);
+    return id;
+  });
   const personas = [
     {
       id: "assistant",
       name: "Assistant",
       color: "from-blue-500 to-cyan-500",
       icon: Sparkles,
+      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // Default assistant construct
     },
     {
       id: "creative",
       name: "Creative Writer",
       color: "from-purple-500 to-pink-500",
       icon: Palette,
+      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // TODO: Replace with actual creative writer construct ID
     },
     {
       id: "analyst",
       name: "Data Analyst",
       color: "from-green-500 to-emerald-500",
       icon: Brain,
+      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // TODO: Replace with actual analyst construct ID
     },
     {
       id: "coach",
       name: "Life Coach",
       color: "from-orange-500 to-yellow-500",
       icon: Zap,
+      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // TODO: Replace with actual coach construct ID
     },
   ];
   const currentPersona =
@@ -170,9 +183,11 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
-
   const streamAIResponse = async (userMessage: string, messageId: string) => {
     try {
+      console.log(`🚀 Sending message with thread_id: ${currentThreadId}`);
+      console.log(`📝 Message: ${userMessage.substring(0, 50)}...`);
+
       const initialMessage: Message = {
         id: messageId,
         content: "",
@@ -183,15 +198,24 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
 
       setMessages((prev) => [...prev, initialMessage]);
       setIsTyping(false);
-      setStreamingMessageId(messageId);
+      setStreamingMessageId(messageId); // Send only the current user message - let InMemorySaver handle conversation history
+      const currentMessage = [
+        {
+          role: "user" as const,
+          content: userMessage,
+        },
+      ];
+
+      console.log(
+        `📋 Sending current message only (${currentMessage.length} message) - InMemorySaver will handle conversation history`
+      );
 
       let currentContent = "";
-
       await streamChat(
-        userMessage,
-        "new-test-2",
-        "9619c8ad-91b3-4771-8091-2d239e2cf221",
-        "roleplay",
+        currentMessage, // Send only current message
+        currentThreadId, // Use the consistent thread_id for memory
+        currentPersona.constructId, // Use construct ID from selected persona
+        "chat",
         (chunk: string) => {
           try {
             let jsonStr = chunk;
