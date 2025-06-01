@@ -106,13 +106,13 @@ class SimpleGraphService:
         # Add end edges
         for end_node in end_nodes:
             if end_node != END:
-                graph_builder.add_edge(end_node, END)
+                        graph_builder.add_edge(end_node, END)
         
         return graph_builder.compile(checkpointer=self.memory_saver)
     
     def create_llm_chain(
         self,
-        model_name: str = "llama3.1",
+        model_name: str = "gemma3:27b",
         base_url: str = "http://localhost:11434",
         system_message: str = "You are a helpful AI assistant.",
         **model_kwargs

@@ -24,7 +24,7 @@ class ModelService:
     
     def _get_model_with_tool_support(self) -> Tuple[Optional[ChatOllama], bool]:
         """Get a model that supports tool calling."""
-        models_to_try = ["llama4", "llama3.1", "llama3-groq-tool-use", "devstral:latest"]
+        models_to_try = ["gemma3:27b", "llama4", "llama3.1", "llama3-groq-tool-use", "devstral:latest"]
         
         for model_name in models_to_try:
             try:
@@ -43,11 +43,10 @@ class ModelService:
             except Exception as e:
                 print(f"Failed to connect to {model_name}: {e}")
                 continue
-        
-        # Fallback to basic model
+          # Fallback to basic model
         try:
-            model = ChatOllama(model="llama3.1", base_url="http://localhost:11434")
-            print("Using basic llama3.1 without tool support")
+            model = ChatOllama(model="gemma3:27b", base_url="http://localhost:11434")
+            print("Using basic gemma3:27b without tool support")
             return model, False
         except Exception as e:
             print(f"Failed to connect to any model: {e}")

@@ -4,7 +4,7 @@ client<llm> Ollama {
   provider "openai-generic"
   options {
     base_url "http://localhost:11434/v1"
-    model gemma3:4b
+    model gemma3:27b
   }
 }
 

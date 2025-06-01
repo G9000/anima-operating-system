@@ -11,7 +11,7 @@ class GraphConfigService:
     """Service providing pre-configured graph setups."""
     
     @staticmethod
-    def create_basic_chat_graph(model_name: str = "llama3.1"):
+    def create_basic_chat_graph(model_name: str = "gemma3:27b"):
         """Create a basic chat graph with standard configuration."""
         llm_chain = simple_graph_service.create_llm_chain(
             model_name=model_name,
@@ -22,7 +22,7 @@ class GraphConfigService:
     
     @staticmethod
     def create_roleplay_chat_graph(
-        model_name: str = "llama3.1",
+        model_name: str = "gemma3:27b",
         character_prompt: str = "You are a friendly character in a roleplay scenario."
     ):
         """Create a roleplay-focused chat graph."""
@@ -36,7 +36,7 @@ class GraphConfigService:
     
     @staticmethod
     def create_assistant_chat_graph(
-        model_name: str = "llama3.1",
+        model_name: str = "gemma3:27b",
         task_focus: str = "general assistance"
     ):
         """Create a task-focused assistant graph."""
@@ -53,7 +53,7 @@ class GraphConfigService:
     
     @staticmethod
     def create_creative_chat_graph(
-        model_name: str = "llama3.1",
+        model_name: str = "gemma3:27b",
         creative_focus: str = "storytelling"
     ):
         """Create a creativity-focused chat graph."""
@@ -69,7 +69,7 @@ class GraphConfigService:
         return simple_graph_service.create_chat_graph(llm_chain=llm_chain)
     
     @staticmethod
-    def create_multi_step_graph(model_name: str = "llama3.1"):
+    def create_multi_step_graph(model_name: str = "gemma3:27b"):
         """Create a multi-step reasoning graph."""
         
         def thinking_node(state):
