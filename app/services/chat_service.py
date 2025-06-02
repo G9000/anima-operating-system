@@ -118,7 +118,6 @@ class ChatService:
         self,
         request: SummarizeRequest,
         db: AsyncSession,
-        user_id: UUID,
         max_messages: Optional[int] = None
     ) -> SummarizeResponse:
         """Summarize a conversation using direct model calls (no graph needed).

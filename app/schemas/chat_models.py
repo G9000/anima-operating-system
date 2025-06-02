@@ -68,9 +68,8 @@ class ConversationHistory(BaseModel):
 class SummarizeRequest(BaseModel):
     messages: List[ChatMessage]
     construct_id: Optional[uuid.UUID] = None
-    summary_style: Optional[Literal["brief", "detailed", "key_points"]] = "detailed"
+    summary_style: Optional[Literal["journal_concise", "journal_reflective", "journal_note"]] = "journal_concise"
     mode: Optional[Literal["system", "construct"]] = "system"
-    journal_style: Optional[Literal["concise", "reflective"]] = "reflective"  # NEW
 
 class SummarizeResponse(BaseModel):
     summary: str
