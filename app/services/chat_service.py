@@ -70,7 +70,9 @@ class ChatService:
             count_new_messages(langchain_messages)
             
             # 4. Prepare request data using utilities
-            config = prepare_graph_config(request.thread_id)            # 5. Check for existing conversation using dedicated service
+            config = prepare_graph_config(request.thread_id)            
+            
+            # 5. Check for existing conversation using dedicated service
             await get_existing_conversation(self.graph, config)
             
             # 6. Prepare request data using dedicated service

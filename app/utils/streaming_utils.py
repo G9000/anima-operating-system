@@ -25,48 +25,31 @@ async def create_streaming_response(result: Dict[str, Any]):
             words = content.split()
             
             for i, word in enumerate(words):
-                # Create streaming chunk in OpenAI format
-                chunk = {
-                    "id": base_response["id"],
-                    "object": "chat.completion.chunk",
-                    "created": base_response["created"],
-                    "model": base_response["model"],
-                    "choices": [{
-                        "index": 0,
-                        "delta": {
-                            "role": "assistant" if i == 0 else None,
-                            "content": word + (" " if i < len(words) - 1 else "")
-                        },
-                        "finish_reason": None
-                    }]
-                }
+                word_with_space = word + (" " if i < len(words) - 1 else "")
+                chunk = create_streaming_chunk(
+                    base_response=base_response,
+                    word=word_with_space,
+                    is_first=(i == 0),
+                    is_final=False
+                )
                 
-                # Remove None values for cleaner output
-                if chunk["choices"][0]["delta"]["role"] is None:
-                    del chunk["choices"][0]["delta"]["role"]
-                
-                yield f"data: {json.dumps(chunk)}\n\n"
+                yield format_sse_data(chunk)
                 await asyncio.sleep(0.05)
             
             # Send final completion chunk
-            final_chunk = {
-                "id": base_response["id"],
-                "object": "chat.completion.chunk",
-                "created": base_response["created"],
-                "model": base_response["model"],
-                "choices": [{
-                    "index": 0,
-                    "delta": {},
-                    "finish_reason": "stop"
-                }]
-            }
+            final_chunk = create_streaming_chunk(
+                base_response=base_response,
+                word="",
+                is_first=False,
+                is_final=True
+            )
             
-            yield f"data: {json.dumps(final_chunk)}\n\n"
+            yield format_sse_data(final_chunk)
             yield "data: [DONE]\n\n"
         
         return StreamingResponse(
             generate(),
-            media_type="text/plain",
+            media_type="text/event-stream",
             headers={
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive"

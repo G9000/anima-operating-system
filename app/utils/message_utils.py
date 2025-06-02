@@ -1,6 +1,7 @@
 """
 Message utility functions for formatting and converting chat messages between different formats.
 """
+import logging
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, BaseMessage
@@ -9,6 +10,9 @@ import uuid
 from app.schemas.chat_models import AgentChatRequest, ChatMessage
 from app.crud.construct import get_construct_by_id
 from ..services.prompt_template_service import prompt_template_service
+
+
+logger = logging.getLogger(__name__)
 
 
 async def format_chat_history(agent_chat_request: AgentChatRequest) -> List[BaseMessage]:
@@ -55,15 +59,13 @@ async def convert_chat_messages_to_langchain(
         mode: Chat mode (default: "chat")
         
     Returns:
-        Tuple of (langchain_messages, system_prompt)
-    """
+        Tuple of (langchain_messages, system_prompt)    """
     langchain_messages = []
-    
     construct = None
     try:
         construct = await get_construct_by_id(db, construct_id)
     except Exception as e:
-        print(f"Error fetching construct {construct_id}: {e}")
+        logger.error(f"Error fetching construct {construct_id}: {e}")
     
     system_prompt = None
     try:
@@ -80,7 +82,7 @@ async def convert_chat_messages_to_langchain(
             custom_instructions=custom_instructions
         )
     except Exception as e:
-        print(f"⚠️ Error generating system prompt: {e}")
+        logger.error(f"Error generating system prompt: {e}")
         system_prompt = prompt_template_service.render_system_prompt(mode=mode)
     
     conversation_messages = chat_messages[system_msg_index:]
@@ -91,6 +93,6 @@ async def convert_chat_messages_to_langchain(
         elif msg.role == "assistant":
             langchain_messages.append(AIMessage(content=msg.content, name="Assistant"))
         else:
-            print(f"⚠️ Unknown message role: {msg.role}")
+            logger.warning(f"Unknown message role: {msg.role}")
 
     return langchain_messages, system_prompt
