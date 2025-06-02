@@ -1,5 +1,6 @@
 """
-Template service for rendering Jinja2 templates for prompts and instructions.
+Prompt template service for rendering Jinja2 templates for prompts and instructions.
+Handles system prompt generation, instruction loading, and guardrail management.
 """
 import json
 from typing import Optional, Dict
@@ -10,8 +11,8 @@ import threading
 from app.models.construct import Construct
 
 
-class TemplateService:
-    """Service for rendering Jinja2 templates."""
+class PromptTemplateService:
+    """Service for rendering Jinja2 templates for prompts and instructions."""
     _instance = None
     
     def __new__(cls):
@@ -20,10 +21,14 @@ class TemplateService:
         return cls._instance
     
     def __init__(self):
+        # Ensure initialization only happens once
+        if hasattr(self, '_initialized'):
+            return
+        self._initialized = True
 
         templates_dir = Path(__file__).parent.parent / "templates"
-
         self.instructions_dir = Path(__file__).parent.parent / "instructions"
+        
         self.env = Environment(
             loader=FileSystemLoader(str(templates_dir)),
             autoescape=select_autoescape(['html', 'xml']),
@@ -35,7 +40,6 @@ class TemplateService:
         self.env.globals['load_guardrails'] = self._load_guardrails
         self.env.globals['load_instruction_file'] = self._load_instruction_file
         
-
         self._file_cache: Dict[str, str] = {}
         self._cache_lock = threading.Lock()
         
@@ -105,7 +109,7 @@ class TemplateService:
         Render the system prompt template.
         
         Args:
-            mode: The mode for the agent (default: "chat_mode")
+            mode: The mode for the agent (default: "chat")
             construct: The construct object if available
             construct_id: The construct ID if construct is not available
             custom_instructions: Additional custom instructions
@@ -141,5 +145,5 @@ class TemplateService:
         return template.render(**context)
 
 
-
-template_service = TemplateService()
+# Global prompt template service instance
+prompt_template_service = PromptTemplateService()
