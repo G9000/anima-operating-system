@@ -434,7 +434,6 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   return (
     <div className={cn("h-full flex flex-col", className)}>
-      {" "}
       <ChatHeader
         persona={selectedPersona}
         currentPersona={currentPersona}
@@ -464,7 +463,6 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
                       : "flex justify-start"
                   )}
                 >
-                  {" "}
                   <div
                     className={cn(
                       "rounded-lg px-4 py-3 text-sm leading-relaxed",
@@ -507,7 +505,7 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
                     <div className="flex items-center gap-2 mb-2">
                       <FileText className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-medium text-foreground">
-                        Chat Summary
+                        Journal Summary
                       </span>
                     </div>
                     {isSummarizing ? (
@@ -531,9 +529,10 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
                         </span>
                       </div>
                     ) : chatSummary ? (
-                      <div className="text-sm text-foreground leading-relaxed">
-                        {chatSummary}
-                      </div>
+                      <MarkdownRenderer
+                        content={chatSummary}
+                        className="text-sm text-foreground leading-relaxed"
+                      />
                     ) : null}
                   </div>
                 </div>

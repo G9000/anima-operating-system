@@ -153,21 +153,29 @@ class ChatService:
             server_date = now.strftime('%A, %B %d, %Y')
             server_time = now.strftime('%H:%M')
 
-
+            # TODO: to implement checking later
+            is_first_meeting = True 
+ 
             system_prompt = prompt_template_service.render_system_prompt(
-                mode="journal_reflective",
+                mode= request.summary_style if request.summary_style else "journal_concise",
                 construct=construct_data,
                 construct_id=str(request.construct_id) if request.construct_id else None,
                 server_date=server_date,
                 server_time=server_time,
-                journal_style=getattr(request, "journal_style", "reflective")
             )
+
+
+            if is_first_meeting:
+                first_meet_prompt = "This is your FIRST conversation with this person. "
+            else:
+                first_meet_prompt = ""
 
             user_prompt = (
                 f"Today is {server_date}. The current time is {server_time}. "
-                "I met this person for the first time in my life. "
+                f"{first_meet_prompt}"
                 "Write your thoughts and feelings about what was discussed.\n\n" + conversation_text
             )
+            
 
             from langchain_core.messages import SystemMessage, HumanMessage
             messages = [
