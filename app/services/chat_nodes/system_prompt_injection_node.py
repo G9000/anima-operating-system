@@ -19,6 +19,8 @@ class SystemPromptInjectionNode(BaseChatNode):
             
             system_prompt = state.get("system_prompt")
             messages = state.get("messages", [])
+
+            # print(f"System prompt: {system_prompt}")
             
             # Check if there's already a system message in the conversation
             has_system_message = any(isinstance(msg, SystemMessage) for msg in messages)

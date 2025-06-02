@@ -5,12 +5,12 @@ Decoupled from the chat service for better separation of concerns.
 from typing import Annotated, List, Callable, Optional
 from typing_extensions import TypedDict
 from langchain_core.messages import BaseMessage, AIMessage
-from langchain_ollama import ChatOllama
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.memory import MemorySaver
+
+from app.services.memory_service import memory_service
+from app.services.llm_config_service import LLMConfig
 
 class SimpleState(TypedDict):
     """State definition for the simple chat graph."""
@@ -20,66 +20,7 @@ class StateGraphService:
     """Service for creating and managing LangGraph state graphs."""
     
     def __init__(self):
-        self.memory_saver = MemorySaver()
-    
-    def create_chat_graph(
-        self, 
-        llm_chain,
-        message_trimmer: Optional[Callable] = None,
-        error_handler: Optional[Callable] = None,
-        max_retries: int = 1
-    ):
-        """
-        Create a chat graph with the provided LLM chain and configuration.
-        
-        Args:
-            llm_chain: The LangChain LLM chain to use for responses
-            system_message: System message for the chatbot
-            message_trimmer: Optional function to trim messages for context window
-            error_handler: Optional custom error handler function
-            max_retries: Maximum number of retry attempts on error
-        
-        Returns:
-            Compiled LangGraph with memory support
-        """
-        def chatbot_node(state: SimpleState):
-            """Main chatbot processing node."""
-            for attempt in range(max_retries + 1):
-                try:
-                    messages = state["messages"]
-                    
-                    # Apply message trimming if provided
-                    if message_trimmer:
-                        messages = message_trimmer(messages)
-                    
-                    # Invoke the LLM chain
-                    response = llm_chain.invoke({"messages": messages})
-                    
-                    return {"messages": [response]}
-                    
-                except Exception as e:
-                    if attempt < max_retries:
-                        print(f"⚠️ Attempt {attempt + 1} failed: {e}, retrying...")
-                        continue
-                    
-                    print(f"❌ Error in chatbot node: {e}")
-                    
-                    # Use custom error handler if provided
-                    if error_handler:
-                        return error_handler(state, e)
-                    
-                    # Default error message
-                    error_msg = AIMessage(content=f"Sorry, I encountered an error: {str(e)}")
-                    return {"messages": [error_msg]}
-        
-        # Create the graph
-        graph_builder = StateGraph(SimpleState)
-        graph_builder.add_node("chatbot", chatbot_node)
-        graph_builder.add_edge(START, "chatbot")
-        graph_builder.add_edge("chatbot", END)
-        
-        # Compile with memory
-        return graph_builder.compile(checkpointer=self.memory_saver)
+        pass
     
     def create_multi_node_graph(
         self,
@@ -121,71 +62,14 @@ class StateGraphService:
             if end_node != END:
                         graph_builder.add_edge(end_node, END)
         
-        return graph_builder.compile(checkpointer=self.memory_saver)
-    
-    def create_llm_chain(
-        self,
-        model_name: str = "gemma3:27b",
-        base_url: str = "http://localhost:11434",
-        system_message: str = "You are Anima OS, a helpful AI assistant.",
-        **model_kwargs
-    ):
-        """
-        Create an LLM chain with the specified configuration.
-        
-        Args:
-            model_name: Name of the model
-            base_url: Base URL for LLM service
-            system_message: System message for the prompt
-            **model_kwargs: Additional model parameters
-        
-        Returns:
-            LangChain LLM chain
-        """
-        # Initialize Ollama model
-        llm = ChatOllama(
-            model=model_name,
-            base_url=base_url,
-            **model_kwargs
-        )
-        
-        prompt_template = ChatPromptTemplate.from_messages([
-            ("system", system_message),
-            MessagesPlaceholder("messages")
-        ])
-        
-        return prompt_template | llm
-    
-    def get_memory_saver(self):
-        """Get the memory saver instance."""
-        return self.memory_saver
-    
-    def clear_memory(self, thread_id: str = None):
-        """
-        Clear memory for a specific thread or all threads.
-        
-        Args:
-            thread_id: Specific thread to clear, or None to clear all
-        """
-        if thread_id:
-            # Clear specific thread (if memory saver supports it)
-            if hasattr(self.memory_saver, 'clear_thread'):
-                self.memory_saver.clear_thread(thread_id)
-            else:
-                print(f"⚠️ Memory saver doesn't support thread-specific clearing")
-        else:
-            # Clear all memory
-            self.memory_saver = MemorySaver()
-            print("🧹 All memory cleared")
+        return graph_builder.compile(checkpointer=memory_service.memory_saver)
+  
     
     def validate_graph(self, graph):
         """Validate that a graph is properly configured."""
         try:
-            # Test with empty state
-            test_state = {"messages": []}
             config = {"configurable": {"thread_id": "test"}}
             
-            # Attempt to get initial state
             graph.get_state(config)
             
             return True, "Graph validation successful"
@@ -205,7 +89,49 @@ class StateGraphService:
             return messages[-max_messages:]
         
         return trim_messages
+    
+    def create_chat_graph(self, chat_state_class):
+        """
+        Create a chat graph using dedicated chat nodes.
+        
+        Args:
+            chat_state_class: The ChatState TypedDict class from chat_service
+        
+        Returns:
+            Compiled LangGraph with memory support using the full chat pipeline
+        """
+        from app.services.chat_nodes import (
+            ContextPreparationNode,
+            SystemPromptInjectionNode,
+            LLMProcessingNode,
+            ResponseFormattingNode
+        )
+        
+        # Initialize node instances
+        context_node = ContextPreparationNode()
+        system_prompt_node = SystemPromptInjectionNode()
+        llm_node = LLMProcessingNode()
+        response_node = ResponseFormattingNode()
+        
+        # Build the graph
+        graph_builder = StateGraph(chat_state_class)
+        
+        # Add nodes using dedicated node classes
+        graph_builder.add_node("context_preparation", context_node.process)
+        graph_builder.add_node("system_prompt_injection", system_prompt_node.process)
+        graph_builder.add_node("llm_processing", llm_node.process)
+        graph_builder.add_node("response_formatting", response_node.process)
+        
+        # Add edges for the chat pipeline
+        graph_builder.add_edge(START, "context_preparation")
+        graph_builder.add_edge("context_preparation", "system_prompt_injection")
+        graph_builder.add_edge("system_prompt_injection", "llm_processing")
+        graph_builder.add_edge("llm_processing", "response_formatting")
+        graph_builder.add_edge("response_formatting", END)
+        
 
+        return graph_builder.compile(checkpointer=memory_service.memory_saver)
+    
 
 # Global graph service instance
 state_graph_service = StateGraphService()

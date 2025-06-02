@@ -62,7 +62,7 @@ class ResponseFormattingNode(BaseChatNode):
                 )
             )
             
-            # Calculate total tokens
+    
             chat_response.usage.total_tokens = (
                 chat_response.usage.prompt_tokens + 
                 chat_response.usage.completion_tokens

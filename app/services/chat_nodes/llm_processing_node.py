@@ -6,23 +6,11 @@ Handles the core LLM processing with mode-aware configuration.
 from typing import Dict, Any
 from .base_node import BaseChatNode
 from app.services.chat_service import ChatState
-from app.services.state_graph_service import state_graph_service
+from app.services.llm_config_service import llm_config_service
 
 
 class LLMProcessingNode(BaseChatNode):
     """Node for processing messages through LLM with mode-aware configuration."""
-    
-    def _get_mode_temperature(self, mode: str) -> float:
-        """Get temperature setting based on chat mode."""
-        temperature_map = {
-            "chat": 0.7,
-            "roleplay": 0.8,
-            "assist": 0.3,
-            "journal": 0.9,
-            "story": 0.8,
-            "silent": 0.1
-        }
-        return temperature_map.get(mode, 0.7)
     
     async def process(self, state: ChatState) -> Dict[str, Any]:
         """Process messages through LLM with mode-aware configuration."""
@@ -32,18 +20,26 @@ class LLMProcessingNode(BaseChatNode):
             request_data = state["request_data"]
             messages = state.get("messages", [])
             mode = state.get("mode", "chat")
-        
-            model_kwargs = {
-                "temperature": request_data.get("temperature") or self._get_mode_temperature(mode),
-            }
             
-            llm_chain = state_graph_service.create_llm_chain(
+
+            config = llm_config_service.create_basic_config(
                 model_name=request_data["model"],
-                system_message="",                    
-                **model_kwargs
+                mode=mode,
+                temperature=request_data.get("temperature")
             )
             
-            self.logger.info(f"Processing with model: {request_data['model']}, mode: {mode}")
+        
+            is_valid, error_msg = llm_config_service.validate_config(config)
+            if not is_valid:
+                return self._handle_error(ValueError(f"Invalid LLM config: {error_msg}"))
+            
+
+            llm_chain = llm_config_service.create_llm_chain(
+                config=config,
+                system_message=""
+            )
+            
+            self.logger.info(f"Processing with model: {config.model_name}, mode: {mode}, temp: {config.temperature}")
             
             response = await llm_chain.ainvoke({"messages": messages})
             
