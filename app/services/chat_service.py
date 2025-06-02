@@ -10,10 +10,10 @@ from fastapi.responses import JSONResponse
 
 from app.schemas.chat_models import ChatRequest
 from app.services.state_graph_service import state_graph_service
-from app.services.message_formatter import MessageFormatter
+from app.utils.message_utils import convert_chat_messages_to_langchain
 from app.services.streaming_service import streaming_service
 from app.repositories.construct_repository import construct_repository
-from app.services.state_preparation_service import state_preparation_service
+from app.utils.graph_state_utils import prepare_graph_config, prepare_request_data, prepare_initial_state
 from app.services.conversation_history_service import conversation_history_service
 
 
@@ -61,9 +61,8 @@ class ChatService:
             construct_data = await construct_repository.get_construct(
                 request.construct_id, db
             )
-            
-            # 2. Convert messages to LangChain format
-            langchain_messages, system_prompt = await MessageFormatter.convert_chat_messages_to_langchain(
+              # 2. Convert messages to LangChain format
+            langchain_messages, system_prompt = await convert_chat_messages_to_langchain(
                 request.messages,
                 db,
                 request.construct_id,
@@ -72,18 +71,17 @@ class ChatService:
             
             # 3. Handle conversation history using dedicated service
             conversation_history_service.count_new_messages(langchain_messages)
-            
-            # 4. Prepare graph configuration using dedicated service
-            config = state_preparation_service.prepare_graph_config(request.thread_id)
+              # 4. Prepare graph configuration using utility function
+            config = prepare_graph_config(request.thread_id)
             
             # 5. Check for existing conversation using dedicated service
             await conversation_history_service.get_existing_conversation(self.graph, config)
             
-            # 6. Prepare request data using dedicated service
-            request_data = state_preparation_service.prepare_request_data(request)
+            # 6. Prepare request data using utility function
+            request_data = prepare_request_data(request)
             
-            # 7. Prepare initial state using dedicated service
-            initial_state = state_preparation_service.prepare_initial_state(
+            # 7. Prepare initial state using utility function
+            initial_state = prepare_initial_state(
                 request_data=request_data,
                 user_id=user_id,
                 construct_data=construct_data,
