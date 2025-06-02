@@ -66,7 +66,9 @@ class ChatService:
                 db, 
                 request.construct_id, 
                 request.mode
-            )            # 3. Handle conversation history using dedicated service
+            )        
+            
+            # 3. Handle conversation history using dedicated service
             count_new_messages(langchain_messages)
             
             # 4. Prepare request data using utilities
