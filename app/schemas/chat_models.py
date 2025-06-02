@@ -64,3 +64,14 @@ class ConversationHistory(BaseModel):
     created_at: str
     last_updated: str
     message_count: int
+
+class SummarizeRequest(BaseModel):
+    messages: List[ChatMessage]
+    construct_id: Optional[uuid.UUID] = None
+    summary_style: Optional[Literal["journal_concise", "journal_reflective", "journal_note"]] = "journal_concise"
+    mode: Optional[Literal["system", "construct"]] = "system"
+
+class SummarizeResponse(BaseModel):
+    summary: str
+    message_count: int
+    timestamp: str

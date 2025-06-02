@@ -8,8 +8,10 @@ from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 from fastapi.responses import JSONResponse
 
-from app.schemas.chat_models import ChatRequest
+from app.schemas.chat_models import ChatRequest, SummarizeRequest, SummarizeResponse
 from app.services.state_graph_service import state_graph_service
+from app.services.model_service import model_service
+from app.services.prompt_template_service import prompt_template_service
 from app.utils.message_utils import convert_chat_messages_to_langchain
 from app.utils.streaming_utils import create_streaming_response
 from app.repositories.construct_repository import construct_repository
@@ -91,8 +93,7 @@ class ChatService:
                 thread_id=request.thread_id,
                 should_stream=request.stream
             )
-                
-            # 8. Execute graph (consolidated in state_graph_service)
+                  # 8. Execute graph (consolidated in state_graph_service)
             result = await self.graph.ainvoke(initial_state, config=config)
             
             if result.get("error"):
@@ -105,13 +106,95 @@ class ChatService:
                 return await create_streaming_response(result)
             else:
                 return result.get("response_content", {})
-            
+                
         except Exception as e:
             logger.error(f"Error processing chat request: {e}")
             return JSONResponse(
                 status_code=500,
                 content={"error": str(e)}
             )
+
+    async def summarize_conversation(
+        self,
+        request: SummarizeRequest,
+        db: AsyncSession,
+        max_messages: Optional[int] = None
+    ) -> SummarizeResponse:
+        """Summarize a conversation using direct model calls (no graph needed).
+        Uses the agent system prompt in journal mode for persona-style summarization.
+        """
+        try:
+            from datetime import datetime
+            model = model_service.get_model()
+            if not model:
+                raise RuntimeError("No model available. Please check Ollama is running.")
+
+    
+            construct_data = await construct_repository.get_construct(
+                request.construct_id, db
+            )
+
+
+            messages_to_summarize = request.messages
+            if max_messages and len(request.messages) > max_messages:
+                messages_to_summarize = request.messages[-max_messages:]
+                logger.info(f"Limiting summarization to most recent {max_messages} messages out of {len(request.messages)} total")
+
+          
+            conversation_text = "\n".join([
+                f"{msg.role.upper()}: {msg.content}"
+                for msg in messages_to_summarize
+                if msg.role in ["user", "assistant"]
+            ])
+
+ 
+            now = datetime.now()
+            server_date = now.strftime('%A, %B %d, %Y')
+            server_time = now.strftime('%H:%M')
+
+            # TODO: to implement checking later
+            is_first_meeting = True 
+ 
+            system_prompt = prompt_template_service.render_system_prompt(
+                mode= request.summary_style if request.summary_style else "journal_concise",
+                construct=construct_data,
+                construct_id=str(request.construct_id) if request.construct_id else None,
+                server_date=server_date,
+                server_time=server_time,
+            )
+
+
+            if is_first_meeting:
+                first_meet_prompt = "This is your FIRST conversation with this person. "
+            else:
+                first_meet_prompt = ""
+
+            user_prompt = (
+                f"Today is {server_date}. The current time is {server_time}. "
+                f"{first_meet_prompt}"
+                "Write your thoughts and feelings about what was discussed.\n\n" + conversation_text
+            )
+            
+
+            from langchain_core.messages import SystemMessage, HumanMessage
+            messages = [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=user_prompt)
+            ]
+
+            response = await model.ainvoke(messages)
+            summary = response.content
+
+            logger.info(f"Successfully generated journal mode summary for {len(messages_to_summarize)} messages")
+
+            return SummarizeResponse(
+                summary=summary,
+                message_count=len(messages_to_summarize),
+                timestamp=now.isoformat()
+            )
+        except Exception as e:
+            logger.error(f"Error summarizing conversation: {e}")
+            raise Exception(f"Failed to summarize conversation: {e}")
 
     def is_available(self) -> bool:
         """Check if the chat service is available."""

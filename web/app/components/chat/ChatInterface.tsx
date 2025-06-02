@@ -12,6 +12,13 @@ import {
   Zap,
   Brain,
   Palette,
+  MessageSquare,
+  PersonStanding,
+  BookOpen,
+  PenTool,
+  Wrench,
+  VolumeX,
+  FileText,
 } from "lucide-react";
 import {
   Button,
@@ -19,6 +26,11 @@ import {
   AvatarFallback,
   AvatarImage,
   Textarea,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/app/components/base";
 import { cn } from "@/app/lib/utils";
 import { MarkdownRenderer } from "./MarkdownRenderer";
@@ -37,6 +49,54 @@ interface Persona {
   color: string;
   icon: React.ComponentType<{ className?: string }>;
 }
+
+type ChatMode = "chat" | "roleplay" | "journal" | "story" | "assist" | "silent";
+
+interface ChatModeConfig {
+  id: ChatMode;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+}
+
+const chatModes: ChatModeConfig[] = [
+  {
+    id: "chat",
+    label: "Chat",
+    icon: MessageSquare,
+    description: "Standard conversational interaction",
+  },
+  {
+    id: "roleplay",
+    label: "Roleplay",
+    icon: PersonStanding,
+    description: "Immersive character roleplay scenarios",
+  },
+  {
+    id: "journal",
+    label: "Journal",
+    icon: BookOpen,
+    description: "Reflective, diary-style interactions",
+  },
+  {
+    id: "story",
+    label: "Story",
+    icon: PenTool,
+    description: "Collaborative storytelling mode",
+  },
+  {
+    id: "assist",
+    label: "Assist",
+    icon: Wrench,
+    description: "Task-focused assistance mode",
+  },
+  {
+    id: "silent",
+    label: "Silent",
+    icon: VolumeX,
+    description: "Minimal response, observation mode",
+  },
+];
 
 interface ChatInterfaceProps {
   className?: string;
@@ -137,6 +197,9 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
     null
   );
   const [selectedPersona, setSelectedPersona] = useState("Assistant");
+  const [chatMode, setChatMode] = useState<ChatMode>("chat");
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [chatSummary, setChatSummary] = useState<string | null>(null);
 
   // Generate a consistent thread_id for this chat session
   const [currentThreadId] = useState(() => {
@@ -153,28 +216,28 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
       name: "Assistant",
       color: "from-blue-500 to-cyan-500",
       icon: Sparkles,
-      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // Default assistant construct
+      constructId: "b40837f7-f1d3-4339-8fe0-a43e0ad2bf83", // Default assistant construct
     },
     {
       id: "creative",
       name: "Creative Writer",
       color: "from-purple-500 to-pink-500",
       icon: Palette,
-      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // TODO: Replace with actual creative writer construct ID
+      constructId: "b40837f7-f1d3-4339-8fe0-a43e0ad2bf83", // TODO: Replace with actual creative writer construct ID
     },
     {
       id: "analyst",
       name: "Data Analyst",
       color: "from-green-500 to-emerald-500",
       icon: Brain,
-      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // TODO: Replace with actual analyst construct ID
+      constructId: "b40837f7-f1d3-4339-8fe0-a43e0ad2bf83", // TODO: Replace with actual analyst construct ID
     },
     {
       id: "coach",
       name: "Life Coach",
       color: "from-orange-500 to-yellow-500",
       icon: Zap,
-      constructId: "9619c8ad-91b3-4771-8091-2d239e2cf221", // TODO: Replace with actual coach construct ID
+      constructId: "b40837f7-f1d3-4339-8fe0-a43e0ad2bf83", // TODO: Replace with actual coach construct ID
     },
   ];
   const currentPersona =
@@ -215,7 +278,7 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
         currentMessage, // Send only current message
         currentThreadId, // Use the consistent thread_id for memory
         currentPersona.constructId, // Use construct ID from selected persona
-        "chat",
+        chatMode, // Use the selected chat mode
         (chunk: string) => {
           try {
             let jsonStr = chunk;
@@ -297,8 +360,8 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
     setMessages([]);
     setStreamingMessageId(null);
     setIsTyping(false);
+    setChatSummary(null);
   };
-
   const exportChat = () => {
     const chatData = {
       timestamp: new Date().toISOString(),
@@ -321,6 +384,52 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const summarizeChat = async () => {
+    if (messages.length === 0) {
+      alert("No messages to summarize");
+      return;
+    }
+
+    setIsSummarizing(true);
+    setChatSummary(null);
+
+    try {
+      // Convert messages to the format expected by the summarization API
+      const conversationMessages = messages.map((msg) => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.content,
+      }));
+
+      const response = await fetch("/api/chat/summarize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+        },
+        body: JSON.stringify({
+          messages: conversationMessages,
+          construct_id: currentPersona.constructId,
+          summary_style: "brief",
+          mode: "construct",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const summary = data.summary || "Failed to generate summary";
+      setChatSummary(summary);
+    } catch (error) {
+      console.error("Summarization error:", error);
+      setChatSummary("Sorry, I couldn't generate a summary. Please try again.");
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   return (
@@ -331,8 +440,11 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
         status="Online"
         exportChat={exportChat}
         clearChat={clearChat}
+        chatMode={chatMode}
+        onModeChange={setChatMode}
+        summarizeChat={summarizeChat}
+        isSummarizing={isSummarizing}
       />
-
       <div className="flex flex-col flex-1 overflow-y-auto max-w-3xl w-full mx-auto bg-cover bg-center bg-no-repeat pb-52">
         <div className="px-4 py-6 flex-1 flex flex-col">
           {messages.length === 0 ? (
@@ -351,7 +463,6 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
                       : "flex justify-start"
                   )}
                 >
-                  {" "}
                   <div
                     className={cn(
                       "rounded-lg px-4 py-3 text-sm leading-relaxed",
@@ -366,8 +477,7 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
                     />
                   </div>
                 </div>
-              ))}
-
+              ))}{" "}
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-muted rounded-lg px-4 py-3">
@@ -385,6 +495,45 @@ export function ChatInterface({ className, threadId }: ChatInterfaceProps) {
                         style={{ animationDelay: "300ms" }}
                       />
                     </div>
+                  </div>
+                </div>
+              )}{" "}
+              {/* Chat Summary Display */}
+              {(isSummarizing || chatSummary) && (
+                <div className="group flex justify-start">
+                  <div className="w-full bg-muted text-foreground rounded-lg px-4 py-3 text-sm leading-relaxed">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">
+                        Journal logs of the day
+                      </span>
+                    </div>
+                    {isSummarizing ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex space-x-1">
+                          <div
+                            className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce"
+                            style={{ animationDelay: "0ms" }}
+                          />
+                          <div
+                            className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce"
+                            style={{ animationDelay: "150ms" }}
+                          />
+                          <div
+                            className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce"
+                            style={{ animationDelay: "300ms" }}
+                          />
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          Generating summary...
+                        </span>
+                      </div>
+                    ) : chatSummary ? (
+                      <MarkdownRenderer
+                        content={chatSummary}
+                        className="text-sm text-foreground leading-relaxed"
+                      />
+                    ) : null}
                   </div>
                 </div>
               )}
@@ -425,12 +574,20 @@ const ChatHeader = ({
   status,
   exportChat,
   clearChat,
+  chatMode,
+  onModeChange,
+  summarizeChat,
+  isSummarizing,
 }: {
   persona: string;
   currentPersona: Persona;
   status?: string;
   exportChat: () => void;
   clearChat: () => void;
+  chatMode: ChatMode;
+  onModeChange: (mode: ChatMode) => void;
+  summarizeChat: () => void;
+  isSummarizing: boolean;
 }) => {
   return (
     <div className="flex w-11/12 items-center justify-between py-4 absolute top-0 left-1/2 transform -translate-x-1/2">
@@ -448,6 +605,65 @@ const ChatHeader = ({
       </div>
 
       <div className="flex items-center gap-2">
+        {/* Chat Mode Selector */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs font-mono hover:bg-primary/10 flex items-center gap-2"
+              title="Change conversation mode"
+            >
+              {(() => {
+                const currentMode = chatModes.find(
+                  (mode) => mode.id === chatMode
+                );
+                const IconComponent = currentMode?.icon || MessageSquare;
+                return (
+                  <>
+                    <IconComponent className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {currentMode?.label}
+                    </span>
+                  </>
+                );
+              })()}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            {chatModes.map((mode) => {
+              const IconComponent = mode.icon;
+              return (
+                <DropdownMenuItem
+                  key={mode.id}
+                  onClick={() => onModeChange(mode.id)}
+                  className={cn(
+                    "flex items-center gap-3 cursor-pointer",
+                    chatMode === mode.id && "bg-primary/10"
+                  )}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">{mode.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {mode.description}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>{" "}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={summarizeChat}
+          disabled={isSummarizing}
+          className="text-xs font-mono hover:bg-primary/10"
+          title="Summarize Chat"
+        >
+          <FileText className="w-4 h-4" />
+        </Button>
         <Button
           variant="ghost"
           size="sm"
