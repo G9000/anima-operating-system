@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from uuid import UUID
 
-from app.schemas.chat_models import ChatRequest
+from app.schemas.chat_models import ChatRequest, SummarizeRequest, SummarizeResponse
 from app.db.session import get_db
 from app.services.chat_service import ChatService
 from app.middleware.auth_supabase import get_current_user
@@ -54,6 +54,57 @@ async def chat_completions(
         
     except Exception as e:
         print(f"❌ Enhanced chat processing failed: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": {
+                    "message": str(e),
+                    "type": "server_error",
+                    "code": 500
+                }
+            }
+        )
+
+@router.post("/chat/summarize", response_model=SummarizeResponse)
+async def summarize_chat(
+    request: SummarizeRequest,
+    current_user_id: UUID = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Summarize a chat conversation."""
+    
+    result = await db.execute(select(User).filter(User.id == current_user_id))
+    current_user = result.scalar_one_or_none()
+    
+    if not current_user:
+        return JSONResponse(
+            status_code=401,
+            content={"error": "User not found"}
+        )
+    
+    if not chat_service.is_available():
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": {
+                    "message": "Chat service is not available. Please check Ollama is running.",
+                    "type": "server_error",
+                    "code": 500
+                }
+            }
+        )    
+    
+    try:
+        response = await chat_service.summarize_conversation(
+            request=request,
+            user_id=current_user_id,
+            db=db
+        )
+        
+        return response
+        
+    except Exception as e:
+        print(f"❌ Chat summarization failed: {e}")
         return JSONResponse(
             status_code=500,
             content={
