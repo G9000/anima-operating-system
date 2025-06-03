@@ -22,7 +22,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-primary/3">
+    <main className="relative min-h-screen w-full ">
       {user ? (
         <Dashboard
           apps={apps}
