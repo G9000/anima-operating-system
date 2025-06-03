@@ -1,2 +1,11 @@
-export { ChatInterface } from './ChatInterface';
-export { MarkdownRenderer } from './MarkdownRenderer';
+export { ChatInterface } from "./ChatInterface";
+export { ChatHeader } from "./ChatHeader";
+export { ChatHeaderAvatar } from "./ChatHeaderAvatar";
+export { ChatModeSelector } from "./ChatModeSelector";
+export { ChatTextInput } from "./ChatTextInput";
+export { ChatMessageBubble } from "./ChatMessageBubble";
+export { ChatEmptyState } from "./ChatEmptyState";
+export { MarkdownRenderer } from "./MarkdownRenderer";
+export { streamChat } from "./chatService";
+export * from "./types";
+export * from "./config";
