@@ -11,7 +11,6 @@ export function FooterSection() {
             Anima <span className="font-light italic text-blue-600/60">OS</span>
           </h3>
         </div>
-
         <div className="relative flex items-center justify-center py-4">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="h-2 w-full max-w-md bg-gradient-to-r from-transparent via-blue-300/20 to-transparent blur-md" />
@@ -84,17 +83,18 @@ export function FooterSection() {
             ))}
           </div>
         </div>
-
         <p className="text-sm text-primary/50 leading-relaxed max-w-2xl mx-auto font-light">
           A platform to create your digital legacy — preserving thoughts,
           memories, and stories that transcend time. Your consciousness,
           eternally woven into the fabric of tomorrow.
-        </p>
-
+        </p>{" "}
         <div className="flex items-center justify-center space-x-6 pt-4 text-xs text-primary/40">
-          <span className="hover:text-primary/60 transition-colors cursor-pointer">
+          <a
+            href="/about"
+            className="hover:text-primary/60 transition-colors cursor-pointer"
+          >
             About
-          </span>
+          </a>
           <span className="text-primary/20">•</span>
           <span className="hover:text-primary/60 transition-colors cursor-pointer">
             Privacy

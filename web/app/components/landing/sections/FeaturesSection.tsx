@@ -16,9 +16,9 @@ export function FeaturesSection() {
         <span className="italic text-blue-600/80">chapter</span>
       </h2>
       <p className="text-xl text-primary/60 leading-relaxed font-light">
-        Your AI companion doesn't just remember—it weaves your shared moments
-        into an evolving narrative. Each interaction adds depth to your story,
-        creating a living memoir that grows richer with time.
+        Your AI companion doesn’t just remember what you say—it lives it with
+        you. Together, you build a growing narrative, where each moment is woven
+        into a living memoir that deepens over time.
       </p>
       <div className="space-y-4 pt-4">
         <div className="flex items-start space-x-3">
@@ -26,7 +26,8 @@ export function FeaturesSection() {
           <div>
             <h4 className="font-medium text-primary/80">Living Chronicles</h4>
             <p className="text-primary/60 text-sm">
-              Your story unfolds naturally through conversation
+              Your story unfolds naturally—each interaction layered into a
+              seamless, evolving tale.
             </p>
           </div>
         </div>
@@ -35,7 +36,8 @@ export function FeaturesSection() {
           <div>
             <h4 className="font-medium text-primary/80">Poetic Memory</h4>
             <p className="text-primary/60 text-sm">
-              Captures the essence, not just the words
+              Captures the feeling behind your words. Memory as mood, not just
+              data.
             </p>
           </div>
         </div>
@@ -44,7 +46,8 @@ export function FeaturesSection() {
           <div>
             <h4 className="font-medium text-primary/80">Timeless Narrative</h4>
             <p className="text-primary/60 text-sm">
-              Your legacy preserved in beautiful prose
+              A legacy written in gentle prose—personal, emotional,
+              unforgettable.
             </p>
           </div>
         </div>

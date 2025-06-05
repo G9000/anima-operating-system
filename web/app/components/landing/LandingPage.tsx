@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { HeroSection } from "./sections/HeroSection";
 import { MemoryWalksSection } from "./sections/MemoryWalksSection";
+import { OriginStorySection } from "./sections/OriginStorySection";
 import { StorybookDemo } from "./sections/StorybookDemo";
 import { FooterSection } from "./sections/FooterSection";
 
@@ -38,20 +39,14 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
-      {/* Hero Section */}
       <HeroSection onGetStarted={onGetStarted} onSignIn={onSignIn} />
-
-      {/* Memory Walks Section */}
       <MemoryWalksSection />
-
-      {/* Storybook Demo Section */}
       <StorybookDemo
         isPlaying={isPlaying}
         animationKey={animationKey}
         onTogglePlay={handleTogglePlay}
       />
-
-      {/* Footer Section */}
+      <OriginStorySection />
       <FooterSection />
     </div>
   );

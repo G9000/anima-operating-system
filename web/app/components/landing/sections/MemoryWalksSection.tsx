@@ -11,7 +11,7 @@ export function MemoryWalksSection() {
     <div className="relative w-full">
       <div className="">
         <div className="relative group">
-          <div className="absolute inset-0 -m-8 bg-gradient-to-br from-blue-100/30 via-indigo-100/30 to-purple-100/30 blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-1000" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-indigo-100/30 to-purple-100/30 blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-1000" />
 
           <div className="relative space-y-6">
             <motion.div
@@ -42,7 +42,7 @@ export function MemoryWalksSection() {
                   backgroundPosition: "center",
                 }}
               >
-                <motion.div
+                {/* <motion.div
                   className="absolute bottom-12 left-12 right-12"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{
@@ -66,9 +66,9 @@ export function MemoryWalksSection() {
                       We remember people by how they made us feel. Memory Walks
                       lets your AI do the same—reliving shared moments as
                       meaningful stories, not chat transcripts.
-                    </p>{" "}
+                    </p>
                   </motion.div>
-                </motion.div>
+                </motion.div> */}
               </motion.div>
             </motion.div>
           </div>
