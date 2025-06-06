@@ -13,7 +13,7 @@ import {
 } from "./storybook/AnimationStates";
 import { AudioLogButton } from "./storybook/AudioLogButton";
 import { useAnimationPhases } from "./storybook/hooks";
-import { useStreamingText } from "./storybook/StreamingText";
+import { useStaticText } from "./storybook/StreamingText";
 import { ANIMATION_PHASES } from "./storybook/types";
 import { MEMORY_WALK_TEXTS } from "./storybook/data";
 
@@ -71,16 +71,14 @@ export function StorybookDemo({
       onTogglePlay();
     }
   };
+  const { renderStaticText, isComplete: isTextComplete } = useStaticText(
+    currentPhase === ANIMATION_PHASES.memoryWalk,
+    MEMORY_WALK_TEXTS
+  );
 
-  const { renderStreamingText, isComplete: isStreamingComplete } =
-    useStreamingText(
-      currentPhase === ANIMATION_PHASES.memoryWalk,
-      MEMORY_WALK_TEXTS
-    );
-
-  // Only consider animation complete when we're in memoryWalk phase AND streaming is done
+  // Only consider animation complete when we're in memoryWalk phase AND text is shown
   const isComplete =
-    currentPhase === ANIMATION_PHASES.memoryWalk && isStreamingComplete;
+    currentPhase === ANIMATION_PHASES.memoryWalk && isTextComplete;
 
   // Reset audio log when animation restarts
   useEffect(() => {
@@ -212,8 +210,9 @@ export function StorybookDemo({
                             transition={{ duration: 0.5 }}
                             className="space-y-6"
                           >
-                            {renderStreamingText()}
-                            {isStreamingComplete && (
+                            {" "}
+                            {renderStaticText()}
+                            {isTextComplete && (
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}

@@ -23,21 +23,9 @@ export interface TextItem {
   imageAlt?: string;
 }
 
-export interface WordItem {
-  word: string;
-  textIndex: number;
-  wordIndex: number;
-  className: string;
-  isLastWordInText: boolean;
-  isImage: boolean;
-  imageUrl?: string;
-  imageAlt?: string;
-}
-
 export const PHASE_DURATIONS = {
   dailyConversation: 3000,
   transformation: 2500,
-  streamingSpeed: 160,
 } as const;
 
 export const ANIMATION_PHASES = {
