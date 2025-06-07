@@ -22,10 +22,8 @@ It’s about continuity.
 
 <br />
 
-Constructs in AnimaOS remember what matters
-not perfectly, but meaningfully.  
-They carry your story, your silences, your small moments,  
-and shape themselves around what you’ve shared.
+Constructs in AnimaOS remember what matters not perfectly, but meaningfully.  
+They carry your story, your silences, your small moments, and shape themselves around what you’ve shared.
 
 <br />
 

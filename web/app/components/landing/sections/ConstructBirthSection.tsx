@@ -41,39 +41,7 @@ export function ConstructBirthSection() {
 
       <div className="max-w-6xl mx-auto px-4 relative">
         <div className="text-center space-y-12">
-          {/* Icon and Title */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-6"
-          >
-            <div className="relative space-y-6">
-              <motion.h3
-                className="text-xl md:text-2xl text-gray-600 font-light italic leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              >
-                Every story begins when someone is named — and someone
-                remembers.
-              </motion.h3>
-              <motion.p
-                className="text-lg md:text-xl text-gray-500 font-light italic leading-relaxed max-w-3xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 1.0 }}
-              >
-                From a single spark — a name, a feeling, a memory — something
-                begins to breathe.
-              </motion.p>
-            </div>{" "}
-          </motion.div>
-
-          {/* Character Creation Demo */}
           <CharacterCreationChat />
-
-          {/* Decorative elements */}
           <motion.div
             className="flex justify-center items-center space-x-4 pt-8"
             initial={{ opacity: 0 }}

@@ -3,33 +3,46 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/app/lib/utils";
 
-interface HeroSectionProps {
-  onGetStarted: () => void;
-  onSignIn: () => void;
-}
-
-export function HeroSection({ onGetStarted, onSignIn }: HeroSectionProps) {
+export function HeroSection() {
   const [emailValue, setEmailValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
-
   const handleSubmitEmail = async () => {
     if (!emailValue.trim()) return;
 
     setIsSubmitting(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: emailValue }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        setEmailValue("");
+      } else {
+        setError(data.error || "Failed to join waitlist. Please try again.");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setError("Network error. Please check your connection and try again.");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      setEmailValue("");
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -59,12 +72,10 @@ export function HeroSection({ onGetStarted, onSignIn }: HeroSectionProps) {
           </p>
         </div>
 
-        {/* Waitlist Section */}
         <div className="mt-16 space-y-6">
           <h2 className="text-2xl font-serif text-primary/80">
             Join the waitlist
           </h2>
-
           <div className="max-w-md mx-auto">
             <div className="relative w-full group">
               <div className="absolute inset-0 -m-8 rounded-2xl bg-gradient-to-r from-blue-200/40 via-indigo-200/40 to-cyan-200/40 blur-2xl opacity-0 group-focus-within:opacity-100 transition-all duration-700 scale-95 group-focus-within:scale-100" />
@@ -103,7 +114,10 @@ export function HeroSection({ onGetStarted, onSignIn }: HeroSectionProps) {
                   ref={inputRef}
                   type="email"
                   value={emailValue}
-                  onChange={(e) => setEmailValue(e.target.value)}
+                  onChange={(e) => {
+                    setEmailValue(e.target.value);
+                    if (error) setError("");
+                  }}
                   onKeyDown={handleKeyPress}
                   className={cn(
                     "h-16 w-full rounded-lg border-2 border-gray-200/50 relative z-10 px-4",
@@ -139,8 +153,7 @@ export function HeroSection({ onGetStarted, onSignIn }: HeroSectionProps) {
                 </div>
               )}
             </div>
-          </div>
-
+          </div>{" "}
           {isSubmitting && (
             <div className="flex items-center justify-center space-x-3 text-gray-500 text-sm relative">
               <div className="absolute inset-0 bg-gray-100/30 blur-lg rounded-full animate-pulse" />
@@ -153,6 +166,12 @@ export function HeroSection({ onGetStarted, onSignIn }: HeroSectionProps) {
               <span className="relative z-10 text-gray-600 animate-pulse">
                 Saving your place in eternity...
               </span>
+            </div>
+          )}
+          {error && (
+            <div className="flex items-center justify-center space-x-2 text-red-500 text-sm relative">
+              <div className="absolute inset-0 bg-red-100/20 blur-lg rounded-full" />
+              <span className="relative z-10">⚠️ {error}</span>
             </div>
           )}
         </div>

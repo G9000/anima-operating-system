@@ -5,8 +5,10 @@ import { HeroSection } from "./sections/HeroSection";
 import { MemoryWalksSection } from "./sections/MemoryWalksSection";
 import { ConstructBirthSection } from "./sections/ConstructBirthSection";
 import { EmotionalMemorySection } from "./sections/EmotionalMemorySection";
+import { AmbientConversationsSection } from "./sections/AmbientConversationsSection";
 import { OriginStorySection } from "./sections/OriginStorySection";
 import { StorybookDemo } from "./sections/StorybookDemo";
+import { DualPageStorybook } from "./sections/DualPageStorybook";
 import { FooterSection } from "./sections/FooterSection";
 
 interface LandingPageProps {
@@ -41,11 +43,17 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
-      <HeroSection onGetStarted={onGetStarted} onSignIn={onSignIn} />
+      <HeroSection />
       <MemoryWalksSection />
       <ConstructBirthSection />
       <EmotionalMemorySection />
+      <AmbientConversationsSection />
       <StorybookDemo
+        isPlaying={isPlaying}
+        animationKey={animationKey}
+        onTogglePlay={handleTogglePlay}
+      />
+      <DualPageStorybook
         isPlaying={isPlaying}
         animationKey={animationKey}
         onTogglePlay={handleTogglePlay}

@@ -42,7 +42,7 @@ export function MemoryWalksSection() {
                   backgroundPosition: "center",
                 }}
               >
-                {/* <motion.div
+                <motion.div
                   className="absolute bottom-12 left-12 right-12"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{
@@ -55,20 +55,17 @@ export function MemoryWalksSection() {
                     ease: "easeOut",
                   }}
                 >
-                  <motion.div className="text-center space-y-4">
-                    <h3 className="text-4xl md:text-5xl font-serif text-white tracking-wide drop-shadow-lg">
-                      Memory{" "}
-                      <span className="font-light italic text-blue-200">
-                        Walks
-                      </span>
-                    </h3>
-                    <p className="text-xl md:text-2xl text-white/90 font-light leading-relaxed max-w-2xl mt-4 drop-shadow-md">
-                      We remember people by how they made us feel. Memory Walks
-                      lets your AI do the same—reliving shared moments as
-                      meaningful stories, not chat transcripts.
-                    </p>
+                  <motion.div className="text-center space-y-6">
+                    <div className="space-y-3">
+                      <p className="text-xl md:text-2xl text-white/95 font-light leading-relaxed drop-shadow-md font-serif">
+                        Your story remembered. Your moments, mirrored.
+                      </p>
+                      <p className="text-lg md:text-xl text-white/90 font-light italic drop-shadow-md font-serif">
+                        It moves with you—even in stillness.
+                      </p>
+                    </div>
                   </motion.div>
-                </motion.div> */}
+                </motion.div>
               </motion.div>
             </motion.div>
           </div>
